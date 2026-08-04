@@ -1,0 +1,6 @@
+@roll_for_bears_HostAddress = http://localhost:5204
+
+GET {{roll_for_bears_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

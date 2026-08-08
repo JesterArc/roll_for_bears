@@ -18,9 +18,6 @@ public partial class RollForBearsContext : DbContext
 
     public virtual DbSet<Account> Accounts { get; set; }
 
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //     => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=roll_for_bears;Username=postgres;Password=p@ssw0rd");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum("user_info", "status", new[] { "active", "pending", "suspended", "banned" });

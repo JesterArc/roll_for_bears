@@ -23,4 +23,8 @@
       <Folder Include="VTT\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Modules\Users\RollForBears.Modules.Users\RollForBears.Modules.Users.csproj" />
+    </ItemGroup>
+
 </Project>

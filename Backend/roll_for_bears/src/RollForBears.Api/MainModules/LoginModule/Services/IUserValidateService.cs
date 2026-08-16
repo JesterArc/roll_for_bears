@@ -1,6 +1,6 @@
-﻿using roll_for_bears.MainModules.LoginModule.Models;
+﻿using RollForBears.Api.MainModules.LoginModule.Models;
 
-namespace roll_for_bears.MainModules.LoginModule.Services;
+namespace RollForBears.Api.MainModules.LoginModule.Services;
 
 public interface IUserValidateService
 {

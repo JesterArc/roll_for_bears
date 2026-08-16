@@ -1,7 +1,7 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using roll_for_bears.Database;
-using roll_for_bears.MainModules.LoginModule.Services;
+using RollForBears.Api.MainModules.LoginModule.Services;
 using RollForBears.Modules.Users;
 
 Env.Load();

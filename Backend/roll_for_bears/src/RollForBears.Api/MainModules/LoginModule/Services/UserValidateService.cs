@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using roll_for_bears.Database;
-using roll_for_bears.MainModules.LoginModule.Models;
+using RollForBears.Api.MainModules.LoginModule.Models;
 
-namespace roll_for_bears.MainModules.LoginModule.Services;
+namespace RollForBears.Api.MainModules.LoginModule.Services;
 
 public class UserValidateService : IUserValidateService
 {
@@ -20,6 +20,6 @@ public class UserValidateService : IUserValidateService
     public async Task<List<Account>> AccountsAsync()
     {
         var accounts = await _context.Accounts.ToListAsync();
-        return  await Task.FromResult(accounts);
+        return await Task.FromResult(accounts);
     }
 }

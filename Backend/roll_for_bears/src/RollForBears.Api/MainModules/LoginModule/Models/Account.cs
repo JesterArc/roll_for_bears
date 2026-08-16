@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace roll_for_bears.MainModules.LoginModule.Models;
+namespace RollForBears.Api.MainModules.LoginModule.Models;
 
 /// <summary>
 /// user accounts

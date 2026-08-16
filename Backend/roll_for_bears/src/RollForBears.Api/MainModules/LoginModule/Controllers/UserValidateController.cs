@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using roll_for_bears.Database;
-using roll_for_bears.MainModules.LoginModule.Services;
+using RollForBears.Api.MainModules.LoginModule.Services;
 
-namespace roll_for_bears.MainModules.LoginModule.Controllers;
+namespace RollForBears.Api.MainModules.LoginModule.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

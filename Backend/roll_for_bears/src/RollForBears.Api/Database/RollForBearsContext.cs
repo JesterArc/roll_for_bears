@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using roll_for_bears.MainModules.LoginModule.Models;
+using RollForBears.Api.MainModules.LoginModule.Models;
 
 namespace roll_for_bears.Database;
 

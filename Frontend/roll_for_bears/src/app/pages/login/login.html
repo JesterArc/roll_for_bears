@@ -1,0 +1,59 @@
+<div class="login-page">
+
+  <div class="login-container">
+    <button class="back-button" type="button" (click)="goBack()">
+      ←
+    </button>
+
+    <div class="login-content">
+      <h1>Roll for Bears</h1>
+
+      <div class="logo-placeholder">
+        Tu bedzie logo pzdr
+      </div>
+
+      <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+          <label for="username">Username/Email</label>
+          <input id="username" type="text" placeholder="username" formControlName="username">
+          @if (
+            loginForm.controls.username.invalid && loginForm.controls.username.touched
+            ) {
+            <span class="error-message">
+                  Username or email is required
+                </span>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="password" formControlName="password">
+          @if (
+            loginForm.controls.password.hasError("required") &&
+            loginForm.controls.password.touched
+            ) {
+            <span class="error-message">
+              Password is required
+            </span>
+          } @if (
+            loginForm.controls.password.hasError('minlength') &&
+            loginForm.controls.password.touched
+          ) {
+            <span class="error-message">
+              Password must be longer than 6 letters
+            </span>
+          }
+        </div>
+
+        <button class="login-button" type="submit">
+          Log in
+        </button>
+
+        <div class="login-links">
+          <a routerLink="/forgot-password">I forgot my password</a>
+          <a routerLink="/register">I dont have account</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

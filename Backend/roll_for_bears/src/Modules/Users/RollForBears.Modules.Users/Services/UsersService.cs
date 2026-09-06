@@ -23,7 +23,8 @@ internal sealed class UsersService : IUsersApi
                 account.Uuid,
                 account.Email,
                 account.CreatedAt,
-                account.StatusChangedAt
+                account.StatusChangedAt,
+                account.Status
             ))
             .ToListAsync();
     }

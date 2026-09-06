@@ -1,0 +1,97 @@
+<div class="register-page">
+
+  <button class="back-button" type="button" (click)="goBack()">
+    ←
+  </button>
+
+  <div class="register-content">
+    <h1>Register now</h1>
+
+    <form class="register-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <label for="username">Username</label>
+        <input id="username" type="text" placeholder="username" formControlName="username">
+
+        @if (
+          registerForm.controls.username.hasError('required') &&
+          registerForm.controls.username.touched
+          ) {
+          <span class="error-message">Username is required</span>
+        }
+
+        @if (
+          registerForm.controls.username.hasError('minlength') &&
+          registerForm.controls.username.touched
+          ) {
+          <span class="error-message">Username must be longer than 3 characters</span>
+        }
+
+        @if (
+          registerForm.controls.username.hasError('maxlength') &&
+          registerForm.controls.username.touched
+          ) {
+          <span class="error-message">Username connot be longer than 20 characters</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="email" formControlName="email">
+
+        @if (
+          registerForm.controls.email.hasError('required') &&
+            registerForm.controls.email.touched
+          ) {
+          <span class="error-message">Email is required</span>
+        }
+
+        @if (
+          registerForm.controls.email.hasError('email') &&
+            registerForm.controls.email.touched
+          ) {
+          <span class="error-message">Enter a valid email</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="password" formControlName="password">
+        @if (
+          registerForm.controls.password.hasError('required') &&
+            registerForm.controls.password.touched
+          ) {
+          <span class="error-message">Password is required</span>
+        }
+
+        @if (
+          registerForm.controls.password.hasError('minlength') &&
+            registerForm.controls.password.touched
+          ) {
+          <span class="error-message">Password must be longer than 6 characters</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="repeatPassword">Repeat password</label>
+        <input id="repeatPassword" type="password" placeholder="repeat password" formControlName="repeatPassword">
+
+        @if (
+          registerForm.controls.repeatPassword.hasError('required') &&
+            registerForm.controls.repeatPassword.touched
+          ) {
+          <span class="error-message">U must repeat the password!</span>
+        }
+
+        @if (
+          !registerForm.controls.repeatPassword.hasError('required') &&
+            registerForm.controls.repeatPassword.touched &&
+            passwordDoNotMatch()
+          ) {
+          <span class="error-message">Passwords do not match!</span>
+        }
+      </div>
+
+      <button class="register-button" type="submit">Register</button>
+    </form>
+  </div>
+</div>

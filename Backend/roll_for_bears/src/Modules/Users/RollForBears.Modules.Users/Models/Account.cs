@@ -14,4 +14,6 @@ public partial class Account
     public string Email { get; set; } = null!;
 
     public DateTime StatusChangedAt { get; set; }
+    
+    public AccountStatus Status { get; set; }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RollForBears.Modules.Users.Contracts.Api;
 using RollForBears.Modules.Users.Database;
+using RollForBears.Modules.Users.Models;
 using RollForBears.Modules.Users.Services;
 
 namespace RollForBears.Modules.Users;
@@ -16,6 +17,13 @@ public static class UsersModule
 
         services.AddDbContext<UsersDbContext>(options =>
             options.UseNpgsql(connectionString));
+        
+        services.AddDbContext<UsersDbContext>(options =>
+            options.UseNpgsql(
+                connectionString,
+                npgsqlOptions =>
+                    npgsqlOptions.MapEnum<AccountStatus>("status")
+            ));
 
         services.AddScoped<IUsersApi, UsersService>();
 

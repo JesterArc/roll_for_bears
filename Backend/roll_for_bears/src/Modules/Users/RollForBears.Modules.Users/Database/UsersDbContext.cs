@@ -28,6 +28,9 @@ public partial class UsersDbContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("UUID");
             entity.Property(e => e.StatusChangedAt).HasColumnType("timestamp(0) without time zone");
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasColumnType("status");
         });
 
         OnModelCreatingPartial(modelBuilder);

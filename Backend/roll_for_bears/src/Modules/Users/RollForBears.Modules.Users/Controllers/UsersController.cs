@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RollForBears.Modules.Users.Contracts.Api;
 using RollForBears.Modules.Users.Contracts.DTOs;
@@ -15,11 +16,81 @@ public sealed class UsersController : ControllerBase
         _usersApi = usersApi;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<AccountDto>>> GetAccounts()
+    [HttpPost("register")]
+    public async Task<ActionResult> RegisterAsync(RegisterRequestDto request)
     {
-        var accounts = await _usersApi.GetAccountsAsync();
+        await _usersApi.RegisterAsync(request);
+        return Ok();
+    }
 
-        return Ok(accounts);
+    [HttpPost("login")]
+    public async Task<ActionResult<LoginResultDto>> LoginAsync(LoginRequestDto request)
+    {
+        var result = await _usersApi.LoginAsync(request);
+        if (result == null)
+        {
+            return Unauthorized();
+        }
+        
+        addRefreshTokenCookie(result.RefreshToken);
+        
+        return Ok(new
+        {
+            result.Uuid,
+            result.Username,
+            result.AccessToken,
+        });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<ActionResult<LoginResultDto>> RefreshTokenAsync(string refreshToken)
+    {
+        string? token = Request.Cookies["refreshToken"];
+        if (string.IsNullOrEmpty(token))
+            return Unauthorized();
+        
+        var result = await _usersApi.RefreshTokenAsync(token);
+        if (result == null)
+        {
+            return Unauthorized();
+        }
+        
+        addRefreshTokenCookie(result.RefreshToken);
+        
+        return Ok(result);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> LogoutAsync(string refreshToken)
+    {
+        string? token = Request.Cookies["refreshToken"];
+        if (!string.IsNullOrEmpty(token))
+            await _usersApi.LogoutAsync(token);
+        
+        Response.Cookies.Delete("refreshToken",
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                    Path = "/"
+                }
+            );
+        
+        return NoContent();
+    }
+    
+    
+    private void addRefreshTokenCookie(string token)
+    {
+        Response.Cookies.Append("refreshToken", token,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddHours(48),
+                Path = "/"
+            });
     }
 }

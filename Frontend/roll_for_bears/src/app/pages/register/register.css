@@ -1,6 +1,13 @@
 .register-page{
   min-height: 100vh;
+  padding: 8px;
   background-color: whitesmoke;
+  position: relative;
+}
+
+.register-container{
+  min-height: 98vh;
+  background-color: white;
   position: relative;
 }
 

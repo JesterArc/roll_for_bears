@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
+import { AuthenticationService } from '../../Services/AuthenticationService';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -10,7 +12,9 @@ import { Location } from '@angular/common';
   templateUrl: './register.html',
 })
 export class Register {
-  private location = inject(Location);
+  private _location = inject(Location);
+  private readonly _authenticationService = inject(AuthenticationService);
+  private readonly _router = inject(Router);
 
   registerForm = new FormGroup({
     username: new FormControl('', { nonNullable: true,
@@ -30,21 +34,27 @@ export class Register {
   }
 
   onSubmit() {
-    this.registerForm.markAllAsTouched();
-
-    if (this.registerForm.invalid) {
+    if (this.registerForm.invalid || this.passwordDoNotMatch()) {
+      this.registerForm.markAllAsTouched();
       return;
     }
 
-    if (this.passwordDoNotMatch()) {
-      return;
-    }
+    const username = this.registerForm.controls.username.value;
+    const password = this.registerForm.controls.password.value;
+    const email = this.registerForm.controls.email.value;
 
-    console.log(this.registerForm.value);
+    this._authenticationService.register({
+      username,
+      email,
+      password
+    }).subscribe({
+      next: (result) => {this._router.navigate(['/login'])},
+      error: (error) => {console.log("Registration failed: ",error);}
+    })
   }
 
   goBack(): void {
-    this.location.back();
+    this._location.back();
   }
 }
 

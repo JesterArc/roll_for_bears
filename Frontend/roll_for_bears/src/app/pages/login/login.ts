@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Location } from '@angular/common';
+import { AuthenticationService } from '../../Services/AuthenticationService';
 
 @Component({
   imports: [ReactiveFormsModule, RouterLink],
@@ -10,7 +11,9 @@ import { Location } from '@angular/common';
   templateUrl: './login.html',
 })
 export class Login {
-  private location = inject(Location);
+  private readonly location = inject(Location);
+  private readonly _authenticationService = inject(AuthenticationService);
+  private readonly _router = inject(Router);
 
   loginForm = new FormGroup({
     username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
@@ -26,7 +29,23 @@ export class Login {
       return;
     }
 
-    console.log(this.loginForm.value);
+    const username = this.loginForm.controls.username.value;
+    const password = this.loginForm.controls.password.value;
+    this._authenticationService.login({
+      username,
+      password
+    }).subscribe({
+      next: (result) => {
+        this._authenticationService.setAccessToken(
+          result.accessToken
+        );
+
+        this._router.navigate(['/']);
+      },
+      error: (error) => {
+        console.log("Login Failed: ", error);
+    }
+    })
   }
 
   goBack(): void {

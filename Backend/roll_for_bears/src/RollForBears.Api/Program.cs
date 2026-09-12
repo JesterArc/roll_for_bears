@@ -21,7 +21,20 @@ builder.Services.AddDbContext<RollForBearsContext>(options =>
         Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
     ));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Angular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200");
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowCredentials();
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors("Angular");
 
 app.UseAuthorization();
 

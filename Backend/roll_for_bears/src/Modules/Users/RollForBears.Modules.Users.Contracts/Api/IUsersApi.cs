@@ -4,5 +4,11 @@ namespace RollForBears.Modules.Users.Contracts.Api;
 
 public interface IUsersApi
 {
-    Task<IReadOnlyList<AccountDto>> GetAccountsAsync();
+    Task RegisterAsync(RegisterRequestDto request);
+    
+    Task<LoginResultDto?> LoginAsync(LoginRequestDto request);
+    
+    Task<LoginResultDto?> RefreshTokenAsync(string tokenRequest);
+    
+    Task LogoutAsync(string tokenRequest);
 }

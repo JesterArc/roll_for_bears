@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Modules\Users\RollForBears.Modules.Users\RollForBears.Modules.Users.csproj" />
+      <ProjectReference Include="..\RollForBears.Modules.Users\RollForBears.Modules.Users.csproj" />
     </ItemGroup>
 
 </Project>

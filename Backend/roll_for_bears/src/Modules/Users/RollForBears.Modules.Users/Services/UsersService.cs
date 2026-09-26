@@ -97,9 +97,9 @@ internal sealed class UsersService : IUsersApi
         {
             const string querry = """
                                   UPDATE user_info.refresh_token
-                                  SET "RevokedAt" = @revokedAt
-                                  WHERE "FmailyId" = @familyId
-                                  AND "RevokedAt" IS NULL;
+                                  SET revoked_at = @revokedAt
+                                  WHERE family_uuid = @familyId
+                                  AND revoked_at IS NULL;
                                   """;
             
             var revokedParam = new NpgsqlParameter("revokedAt", currentTime);
@@ -152,12 +152,12 @@ internal sealed class UsersService : IUsersApi
 
         const string querry = """
                               UPDATE user_info.refresh_token
-                              SET "RevokedAt" = @revokedAt
-                              WHERE "FamilyId" = (
-                                  SELECT "FamilyId" FROM user_info.refresh_token
-                                                    WHERE "TokenHash" = @hash
+                              SET revoked_at = @revokedAt
+                              WHERE family_uuid = (
+                                  SELECT t.family_uuid FROM user_info.refresh_token t
+                                                    WHERE t.token_hash = @hash
                                                     LIMIT 1)
-                              AND "RevokedAt" IS NULL;
+                              AND revoked_at IS NULL;
                               """;
         
         var revokedParam = new NpgsqlParameter("revokedAt", currentTime);

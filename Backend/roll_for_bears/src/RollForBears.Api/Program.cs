@@ -12,6 +12,8 @@ builder.Services
     .AddControllers()
     .AddApplicationPart(typeof(UsersModule).Assembly);
 
+//TODO: after implementing the module add .AddApplicationPart(typeof(SessionsModule).Assembly) here ^;
+
 builder.Services.AddUsersModule(builder.Configuration);
 
 builder.Services.AddScoped<IUserValidateService, UserValidateService>();

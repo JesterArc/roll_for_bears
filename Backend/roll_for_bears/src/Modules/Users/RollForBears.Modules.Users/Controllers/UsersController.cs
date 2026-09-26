@@ -32,7 +32,7 @@ public sealed class UsersController : ControllerBase
             return Unauthorized();
         }
         
-        addRefreshTokenCookie(result.RefreshToken);
+        AddRefreshTokenCookie(result.RefreshToken);
         
         return Ok(new
         {
@@ -55,7 +55,7 @@ public sealed class UsersController : ControllerBase
             return Unauthorized();
         }
         
-        addRefreshTokenCookie(result.RefreshToken);
+        AddRefreshTokenCookie(result.RefreshToken);
         
         return Ok(result);
     }
@@ -81,7 +81,7 @@ public sealed class UsersController : ControllerBase
     }
     
     
-    private void addRefreshTokenCookie(string token)
+    private void AddRefreshTokenCookie(string token)
     {
         Response.Cookies.Append("refreshToken", token,
             new CookieOptions

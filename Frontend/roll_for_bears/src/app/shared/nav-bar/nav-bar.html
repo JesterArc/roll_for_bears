@@ -1,0 +1,49 @@
+<div class="navbar">
+
+  <div class="navbar-left">
+    <a class="logo">
+      Roll For Bears
+    </a>
+
+    <div class="create-dropdown">
+      <button type="button" class="create-button" (click)="changeDropDown()">
+        Create
+
+        <span class="dropdown-arrow" [class.open]="isCreateDropDownOpen">
+        ⌄
+        </span>
+      </button>
+
+      @if (isCreateDropDownOpen){
+        <div class="create-dropdown-menu">
+
+          <button class="create-dropdown-option" type="button">
+            Create Character
+          </button>
+          <hr>
+          <button class="create-dropdown-option" type="button">
+            Create System
+          </button>
+        </div>
+      }
+    </div>
+
+    <button class="navbar-link" routerLink="/sessions">Sessions</button>
+
+    <button class="navbar-link" routerLink="/marketplace">Marketplace</button>
+  </div>
+
+  <div class="navbar-right">
+    <button type="button" class="notification-button">
+      <img src="/notification-4-svgrepo-com.svg" role="button" alt="notification">
+    </button>
+
+    <button type="button" class="profile-button">
+      <img src="/profile-round-1342-svgrepo-com.svg" role="button" alt="profile">
+    </button>
+
+    <button type="button" class="logout-button">
+      <img src="/logout-svgrepo-com.svg" role="button" alt="logout">
+    </button>
+  </div>
+</div>

@@ -1,0 +1,225 @@
+<!--TODO dodac @for w zaleznosci jak bedzie otrzymywane gamemode z backendu-->
+<app-nav-bar></app-nav-bar>
+
+<main class="create-session-page">
+
+  <form class="session-form" [formGroup]="sessionForm" (ngSubmit)="onSubmit()">
+
+    <div class="session-form-left">
+
+      <div class="session-top-row">
+        <div class="session-name-container">
+          <input
+            id="session-name"
+            class="session-name-input"
+            type="text"
+            formControlName="session_name"
+            placeholder="Session name"
+          >
+
+          <button
+            class="session-edit-name-button"
+            type="button"
+            aria-label="Edit session name"
+          >
+            <img src="/edit-2-svgrepo-com.svg" alt="Edit">
+          </button>
+        </div>
+
+        <div class="session-tagline-container">
+          <label for="session-tagline">
+            Short tagline
+          </label>
+
+          <input
+            class="session-tagline-input"
+            id="session-tagline"
+            type="text"
+            formControlName="session_tagline"
+            placeholder="Short tagline"
+          >
+        </div>
+      </div>
+
+      <div class="generate-notes-container">
+        <input
+          id="generate-notes"
+          class="generate-notes"
+          type="checkbox"
+          formControlName="generate_notes"
+        >
+
+        <label for="generate-notes">
+          Generate notes
+        </label>
+
+        <button
+          class="generate-notes-info-button"
+          type="button"
+          aria-label="Generate notes information"
+        >
+          <img src="/info-circle-svgrepo-com.svg" alt="info">
+        </button>
+      </div>
+
+      <div class="sessions-field">
+        <label for="game-system">
+          Game system:
+        </label>
+
+        <input
+          formControlName="game_system"
+          id="game-system"
+          placeholder="Game system"
+          type="text"
+        >
+      </div>
+
+      <div class="game-mode">
+
+        @for (game_mode of gameModes; track game_mode; let i = $index){
+          <div class="game-mode-option">
+
+            <input type="radio" [id]="'game-mode-' + i" formControlName="game_mode" [value]="game_mode">
+
+            <label [for]="'game-mode-' + i">
+              {{ game_mode }}
+            </label>
+          </div>
+
+        }
+
+      </div>
+
+      <div class="session-field">
+        <label for="language">
+          Language:
+        </label>
+
+        <input
+          id="language"
+          formControlName="language"
+          type="text"
+          placeholder="Language"
+        >
+      </div>
+
+      <div class="session-field">
+        <label for="session-date">
+          Session date (optional):
+        </label>
+
+        <input
+          formControlName="session_date"
+          id="session-date"
+          type="date"
+        >
+      </div>
+
+      <div class="session-field-players-limit">
+        <label>
+          Min/max players:
+        </label>
+
+        <input
+          class="players-limit-input"
+          type="number"
+          formControlName="min_players"
+          min="1"
+          placeholder="Min"
+        >
+
+        <span>/</span>
+
+        <input
+          class="players-limit-input"
+          type="number"
+          formControlName="max_players"
+          min="1"
+          placeholder="Max"
+        >
+      </div>
+
+      <div class="session-description-container">
+        <label for="session-description">
+          Description:
+        </label>
+
+        <textarea
+          id="session-description"
+          class="session-description"
+          formControlName="description"
+          placeholder="Description"
+        ></textarea>
+      </div>
+    </div>
+
+
+    <div class="session-form-right">
+      <div class="session-players-header">
+        <h2>
+          Current players: {{ players.length }} /...
+        </h2>
+
+        <button type="button" class="requests-button">
+          Requests
+        </button>
+      </div>
+
+      <div class="players-list">
+
+        @for (player of players; track player.id){
+          <div class="player-row">
+            <div class="player-info">
+              <img src="/profile-round-1342-svgrepo-com.svg" alt="">
+
+              <span class="player-name">
+                {{ player.name }}
+              </span>
+
+              @if (player.isOwner){
+                <span class="player-owner-icon">
+                  <img src="/crown-svgrepo-com.svg" alt="(owner)">
+                </span>
+              }
+            </div>
+
+            <div class="player-actions">
+              <select
+                class="player-role-select"
+                #roleSelect
+                (change)="changePlayerRole(player.id, $any(roleSelect.value))"
+              >
+                <option value="" disabled>
+                  Choose...
+                </option>
+
+                <option value="Player">
+                  Player
+                </option>
+
+                <option value="GM">
+                  GM
+                </option>
+              </select>
+
+              <button type="button" class="player-action-button">
+                <img src="/message-square-dots-svgrepo-com.svg" alt="">
+              </button>
+
+              <button type="button" class="player-action-button">
+                <img src="/options-vertical-svgrepo-com.svg" alt="">
+              </button>
+
+              <button type="button" class="player-action-button">
+                <img src="/delete-2-svgrepo-com.svg" alt="">
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+
+  </form>
+</main>

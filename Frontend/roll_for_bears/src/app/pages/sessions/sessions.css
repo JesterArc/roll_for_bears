@@ -1,0 +1,124 @@
+.sessions-page {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 10%;
+  gap: 70px;
+  padding: 50px 70px;
+  background: white;
+  min-height: calc(100vh - 6vh);
+}
+
+.sessions-content {
+  width: 100%;
+}
+
+.sessions-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.sessions-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.sessions-filter-button {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+}
+
+.sessions-filter-button:hover {
+  background-color: whitesmoke;
+}
+
+.sessions-group {
+  margin-bottom: 28px;
+}
+
+.sessions-group h2 {
+  margin-left: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.sessions-list {
+  display: grid;
+  gap: 14px;
+}
+
+.sessions-list-row {
+  display: grid;
+  grid-template-columns: minmax(350px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.sessions-row-card {
+  display: grid;
+  padding: 12px 16px;
+  background-color: gainsboro;
+  border: 1px solid black;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.session-row-title-mode {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.session-row-info {
+  font-size: 14px;
+}
+
+.session-row-date {
+  font-size: 14px;
+}
+
+.sessions-row-request {
+  padding: 16px;
+  background-color: black;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sessions-row-request:hover {
+  background-color: dimgrey;
+}
+
+.sessions-actions {
+  display: grid;
+  align-content: start;
+  gap: 32px;
+}
+
+.sessions-actions-button {
+  width: 100%;
+  padding: 16px;
+  background-color: black;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sessions-actions-button:hover {
+  background-color: dimgrey;
+}

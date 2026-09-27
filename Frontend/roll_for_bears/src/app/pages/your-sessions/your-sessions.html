@@ -1,0 +1,41 @@
+<app-nav-bar></app-nav-bar>
+
+<main class="your-sessions-page">
+  <button class="go-back-button" type="button" (click)="goBack()">
+    ←
+  </button>
+
+  <div class="sessions-part">
+    <h1>Your sessions:</h1>
+
+    <div class="sessions-list">
+      @for (session of sessions; track session.id) {
+        <div class="sessions-list-row">
+          <div class="session-row-card" role="link" (click)="goToSessionDetails(session.id)"
+               (keydown.enter)="goToSessionDetails(session.id)">
+            <h2 class="session-row-title-mode">
+              {{ session.name }} ({{ session.gameMode }})
+            </h2>
+            <p class="session-row-info">
+              {{ session.description }} | player slots: {{ session.playerSlots }} | {{ session.language }}
+            </p>
+            <time class="session-row-date">
+              {{ session.date }}
+            </time>
+          </div>
+
+          <button class="session-row-goto-vtt" type="button" (click)="goToVtt(session.id)">
+            Go to session
+          </button>
+        </div>
+      } @empty {
+        <div class="sessions-list-empty">
+          <h3>You haven't participated in any session yet!</h3>
+          <button class="find-first-session" type="button">
+            Find session
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</main>

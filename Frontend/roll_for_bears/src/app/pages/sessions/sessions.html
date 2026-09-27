@@ -1,0 +1,85 @@
+<!--TODO PAGINACJA!!! opcjonalnie wyrzucenie sessions-list do oddzielnego pliku by uniknac paginacji-->
+<app-nav-bar></app-nav-bar>
+
+<main class="sessions-page">
+
+  <div class="sessions-content">
+
+    <div class="sessions-header">
+      <h1>Active Sessions:</h1>
+
+      <button class="sessions-filter-button" type="button">
+        <img src="/filter-svgrepo-com.svg" alt="Filter">
+      </button>
+    </div>
+
+    <div class="sessions-group">
+      @if (recomendations.length > 0){
+        <h2>Recommendations:</h2>
+
+        <div class="sessions-list">
+          @for (session of recomendations; track session.id){
+            <div class="sessions-list-row">
+              <div class="sessions-row-card">
+                <h3 class="sessions-row-title-mode">
+                  {{ session.name }} ({{ session.gameMode }})
+                </h3>
+
+                <p class="sessions-row-info">
+                  {{ session.description }} | player slots: {{ session.playerSlots }} | {{ session.language }}
+                </p>
+
+                <time class="session-row-date">
+                  {{ session.date }}
+                </time>
+              </div>
+
+              <button class="sessions-row-request" type="button" (click)="sendRequest(session.id)">
+                Send Request
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="sessions-group">
+      @if (recomendations.length > 0){
+        <h2>Others</h2>
+      }
+      <div class="sessions-list">
+        @for (session of recomendations; track session.id){
+          <div class="sessions-list-row">
+            <div class="sessions-row-card">
+              <h3 class="sessions-row-title-mode">
+                {{ session.name }} ({{ session.gameMode }})
+              </h3>
+
+              <p class="sessions-row-info">
+                {{ session.description }} | player slots: {{ session.playerSlots }} | {{ session.language }}
+              </p>
+
+              <time class="session-row-date">
+                {{ session.date }}
+              </time>
+            </div>
+
+            <button class="sessions-row-request" type="button" (click)="sendRequest(session.id)">
+              Send Request
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="sessions-actions">
+    <button class="sessions-actions-button" type="button" (click)="goToCreateSession()">
+      Create Session
+    </button>
+
+    <button class="sessions-actions-button" type="button" (click)="goToYourSessions()">
+      Your Sessions
+    </button>
+  </div>
+</main>

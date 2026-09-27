@@ -8,6 +8,7 @@ body {
 }
 
 body {
+  min-height: 100vh;
   font-family: Arial, sans-serif;
   background-color: #c6d7e4;
 }

@@ -1,0 +1,115 @@
+.your-sessions-page {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px 36px;
+  background: white;
+  min-height: calc(100vh - 6vh);
+}
+
+.go-back-button {
+  padding: 0;
+  background: none;
+  border: none;
+  color: black;
+  font-size: 32px
+}
+
+.go-back-button:hover {
+  background-color: whitesmoke;
+}
+
+.sessions-part {
+  margin-top: 12px;
+}
+
+.sessions-part h1{
+  font-size: 16px;
+  font-weight: 550;
+}
+
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sessions-list-row {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.session-row-card {
+  display: grid;
+  gap: 4px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  background-color: gainsboro;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid black;
+}
+
+.session-row-card:hover {
+  background-color: whitesmoke;
+}
+
+.session-row-title-mode {
+  margin: 0;
+  color: black;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.session-row-info {
+  margin: 0;
+  color: black;
+  font-size: 12px;
+}
+
+.session-row-date {
+  margin: 0;
+  color: black;
+  font-size: 12px;
+}
+
+.session-row-goto-vtt {
+  width: fit-content;
+  padding: 14px 18px;
+  background-color: black;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.session-row-goto-vtt:hover {
+  background-color: dimgray;
+}
+
+.empty-session {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.empty-sessions h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.find-first-session {
+  padding: 10px 18px;
+  background-color: black;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+}
+
+.find-first-session:hover {
+  background-color: dimgray;
+}

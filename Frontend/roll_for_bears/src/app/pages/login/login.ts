@@ -40,7 +40,7 @@ export class Login {
           result.accessToken
         );
 
-        this._router.navigate(['/']);
+        this._router.navigate(['/home']);
       },
       error: (error) => {
         console.log("Login Failed: ", error);

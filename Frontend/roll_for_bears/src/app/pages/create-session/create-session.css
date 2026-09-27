@@ -1,0 +1,364 @@
+.create-session-page {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: white;
+  padding: 40px 60px;
+  min-height: calc(100vh - 6vh);
+}
+
+.session-form {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 450px;
+  gap: 60px;
+}
+
+.session-form-left {
+  width: 100%;
+  max-width: 750px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.session-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: end
+}
+
+.session-name-container, .session-tagline-container {
+  display: grid;
+  gap: 8px;
+}
+
+.session-name-container {
+  position: relative;
+}
+
+.session-name-input,
+.session-tagline-input {
+  width: 100%;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border: 1px solid black;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 16px;
+  color: black;
+}
+
+.session-name-input:focus,
+.session-tagline-input:focus {
+  outline: none;
+  border-color: black;
+  box-shadow: 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.session-tagline-container label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.session-edit-name-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+}
+
+.session-edit-name-button:hover {
+  background-color: whitesmoke;
+}
+
+.session-name-input {
+  padding-right: 48px;
+}
+
+.generate-notes-container {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.generate-notes {
+  width: 20px;
+  height: 20px;
+}
+
+.generate-notes-container label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.generate-notes-info-button {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+}
+
+.generate-notes-info-button:hover {
+  background-color: whitesmoke;
+}
+
+.generate-notes-info-button img {
+  width: 20px;
+  height: 20px;
+}
+
+.session-field {
+  gap: 8px;
+  display: grid;
+}
+
+.session-field label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.session-field input {
+  width: 100%;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border: 1px solid black;
+  border-radius: 8px;
+  background-color: white;
+  color: black;
+  font-size: 16px;
+}
+
+.session-field input:focus {
+  outline: none;
+  border-color: black;
+  box-shadow: 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.game-mode {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 24px;
+  align-items: center;
+}
+
+.game-mode-option {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.game-mode-option input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.game-mode-option label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.session-field-players-limit {
+  display: grid;
+  grid-template-columns: max-content 90px max-content 90px;
+  align-items: center;
+  gap: 10px;
+}
+
+.session-field-players-limit label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.session-field-players-limit span {
+  font-size: 26px;
+}
+
+.players-limit-input {
+  width: 100%;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border: 1px solid black;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 16px;
+}
+
+.players-limit-input:focus {
+  outline: none;
+  border-color: black;
+  box-shadow: 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.session-description-container {
+  display: grid;
+
+  gap: 8px;
+}
+
+.session-description-container label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.session-description {
+  width: 100%;
+  min-height: 180px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border: 1px solid black;
+  border-radius: 8px;
+  background-color: white;
+  color: black;
+  font-size: 16px;
+  resize: vertical;
+}
+
+.session-description:focus {
+  outline: none;
+  border-color: black;
+  box-shadow: 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.session-form-right {
+  width: 100%;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+}
+
+.session-players-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  align-items: center;
+
+  gap: 20px;
+}
+
+.session-players-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.requests-button {
+  padding: 10px 16px;
+  background-color: black;
+  border: 1px solid black;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.requests-button:hover {
+  background-color: dimgray;
+}
+
+.players-list {
+  display: grid;
+  align-items: start;
+  gap: 12px;
+}
+
+.player-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  background-color: lightcyan;
+  border: 1px solid black;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.player-avatar {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+}
+
+.player-avatar img {
+  width: 26px;
+  height: 26px;
+}
+
+.player-owner-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+}
+
+.player-owner-icon img {
+  width: 18px;
+  height: 18px;
+}
+
+.player-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-role-select {
+  min-width: 105px;
+  padding: 8px 10px;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.player-role-select:focus {
+  outline: none;
+  box-shadow: 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.player-action-button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+}
+
+.player-action-button:hover {
+  background-color: whitesmoke;
+}
+
+.player-action-button img {
+  width: 22px;
+  height: 22px;
+}

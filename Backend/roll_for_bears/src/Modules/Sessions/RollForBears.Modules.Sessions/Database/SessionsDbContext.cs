@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RollForBears.Modules.Sessions.Contracts.Enums;
 using RollForBears.Modules.Sessions.Models;
 
 namespace RollForBears.Modules.Sessions.Database;
@@ -17,12 +18,14 @@ public partial class SessionsDbContext : DbContext
     {
         modelBuilder.HasPostgresEnum("user_info", "game_type", ["campaign", "oneshot"]);
         modelBuilder.HasPostgresEnum("user_info", "player_role", ["gamemaster", "player"]);
+        modelBuilder.HasPostgresEnum<GameType>(nameTranslator: new EnumTranslator());
+        modelBuilder.HasPostgresEnum<PlayerRole>(nameTranslator: new EnumTranslator());
         
         modelBuilder.Entity<Session>(entity =>
         {
             entity.HasKey(e => e.Uuid).HasName("session_details_pkey");
 
-            entity.ToTable("session_details", "sessions_info");
+            entity.ToTable("session_details", "session_info");
             
             entity.Property(e => e.Uuid)
                 .ValueGeneratedNever()
@@ -49,6 +52,7 @@ public partial class SessionsDbContext : DbContext
                 .IsRequired();
             
             entity.Property(e => e.GameType)
+                .HasConversion<string>()
                 .HasColumnName("game_type")
                 .HasColumnType("game_type")
                 .IsRequired();
@@ -77,13 +81,15 @@ public partial class SessionsDbContext : DbContext
                 .HasColumnName("next_session_date")
                 .HasColumnType("date")
                 .IsRequired(false);
+            
+            
         });
 
         modelBuilder.Entity<SessionPlayer>(entity =>
         {
             entity.HasKey(e => e.ConnectionId).HasName("session_players_pkey");
 
-            entity.ToTable("session_players", "sessions_info");
+            entity.ToTable("session_players", "session_info");
 
             entity.HasIndex(e => new {e.AccountId, e.SessionId}, "account_session_unique").IsUnique();
             
@@ -101,6 +107,7 @@ public partial class SessionsDbContext : DbContext
                 .IsRequired();
             
             entity.Property(e => e.Role)
+                .HasConversion<string>()
                 .HasColumnName("player_role")
                 .HasColumnType("player_role")
                 .IsRequired();

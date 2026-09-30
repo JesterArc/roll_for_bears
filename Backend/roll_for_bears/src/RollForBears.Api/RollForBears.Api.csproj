@@ -24,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Modules\Sessions\RollForBears.Modules.Sessions\RollForBears.Modules.Sessions.csproj" />
       <ProjectReference Include="..\Modules\Users\RollForBears.Modules.Users\RollForBears.Modules.Users.csproj" />
     </ItemGroup>
 

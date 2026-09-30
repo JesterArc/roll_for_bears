@@ -22,5 +22,5 @@ public partial class Session
     public DateTime? NextSessionDate { get; set; }
     
     public virtual ICollection<SessionPlayer> Players { get; set; } = new List<SessionPlayer>();
-    public virtual Account Owner { get; set; } = null!;
+    //public virtual Account Owner { get; set; } = null!;
 }

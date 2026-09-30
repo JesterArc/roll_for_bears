@@ -16,7 +16,7 @@ public sealed class SessionInfoDto
     //TODO: replace string with actual data type for GameLanguage
     public required string GameLanguage { get; set; } = null!;
     public required string OwnerUsername { get; set; } = null!;
-    public required string GameDescription { get; set; } = null!;
+    public required string SessionDescription { get; set; } = null!;
     public DateTime? NextSessionDate { get; set; }
     public ICollection<SessionPlayerInfoDto> Players { get; set; } = new List<SessionPlayerInfoDto>();
 }

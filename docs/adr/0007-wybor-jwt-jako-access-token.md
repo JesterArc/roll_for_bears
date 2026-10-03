@@ -36,4 +36,8 @@ Wada: Obciążenie bazy danych ze względu na dużą ilość operacji in/out ora
 
 Session based authentication
 Zaleta: łatwe unieważnienie sesji użytkownika.
-Wada: konieczność przechowywania każdej aktywnej sesji
+Wada: konieczność przechowywania każdej aktywnej sesji.
+
+PASETO
+Zaleta: nowoczesne rozwiązanie i bezpieczniejsze od JWT.
+Wada: brak wsparcia dla Oauth oraz mniej rozbudowany ekosystem.

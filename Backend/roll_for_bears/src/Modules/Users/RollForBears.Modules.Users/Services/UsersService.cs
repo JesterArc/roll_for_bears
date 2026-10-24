@@ -166,6 +166,18 @@ internal sealed class UsersService : IUsersApi
         await _dbContext.Database.ExecuteSqlRawAsync(querry, revokedParam, hashParam);
     }
 
+    public async Task<string?> GetPlayerUsernameAsync(string playerUuid)
+    {
+        return await _dbContext.Accounts.Where(a=> a.Uuid.ToString() == playerUuid).Select(a => a.Username)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<Dictionary<string, string>> GetSessionPlayersUsernamesAsync(List<string> playerUuids)
+    {
+        var accounts = await _dbContext.Accounts.Where(a => playerUuids.Contains(a.Uuid.ToString())).ToListAsync();
+        return accounts.ToDictionary(a => a.Uuid.ToString(), a => a.Username ?? "");
+    }
+
     private async Task AddRefreshTokenToDb(string token, Guid accountId)
     {
         string hash = _refreshTokenGenerator.Hash(token);

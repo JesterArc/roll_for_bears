@@ -7,11 +7,12 @@ public interface ISessionsApi
 {
     Task CreateSessionAsync(SessionCreateRequestDto request);
     
-    Task<SessionInfoDto?> GetSessionInfoAsync(string sessionId);
+    Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId);
+    Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId);
     
-    Task<ICollection<SessionInfoDto?>> GetSessionsAsync(int page, int pageSize);
+    Task<ICollection<SessionInfoListViewDto?>> GetSessionsAsync(int page, int pageSize);
     
-    Task<ICollection<SessionInfoDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request);
+    Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request);
     
     Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId);
     
@@ -22,7 +23,7 @@ public interface ISessionsApi
     
     Task RemovePlayerAsync(string sessionId, string username);
     
-    Task<SessionInfoDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request);
+    Task<SessionInfoSpecificDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request);
     
     Task DeleteSessionAsync(string sessionId);
 }

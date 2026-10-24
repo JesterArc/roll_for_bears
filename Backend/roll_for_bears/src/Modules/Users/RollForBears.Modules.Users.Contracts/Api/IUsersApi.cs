@@ -11,4 +11,7 @@ public interface IUsersApi
     Task<LoginResultDto?> RefreshTokenAsync(string tokenRequest);
     
     Task LogoutAsync(string tokenRequest);
+    Task<string?> GetPlayerUsernameAsync(string playerUuid);
+    
+    Task<Dictionary<string, string>> GetSessionPlayersUsernamesAsync(List<string> playerUuids);
 }

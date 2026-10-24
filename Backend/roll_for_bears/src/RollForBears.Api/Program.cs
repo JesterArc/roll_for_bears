@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using roll_for_bears.Database;
 using RollForBears.Api.MainModules.LoginModule.Services;
 using RollForBears.Modules.Sessions;
+using RollForBears.Modules.Sessions.Contracts.Enums;
 using RollForBears.Modules.Users;
 
 Env.Load();
@@ -24,8 +25,8 @@ builder.Services.AddScoped<IUserValidateService, UserValidateService>();
 
 builder.Services.AddDbContext<RollForBearsContext>(options =>
     options.UseNpgsql(
-        Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
-    ));
+        Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"),
+        o => o.MapEnum<GameType>("game_type", "session_info")));
 
 builder.Services.AddCors(options =>
 {

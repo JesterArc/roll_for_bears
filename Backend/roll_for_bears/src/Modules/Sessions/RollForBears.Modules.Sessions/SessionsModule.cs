@@ -17,15 +17,12 @@ public static class SessionsModule
             "DB_CONNECTION_STRING is not configured.");
         
         services.AddDbContext<SessionsDbContext>(options =>
-            options.UseNpgsql(connectionString));
-        
-        services.AddDbContext<SessionsDbContext>(options =>
             options.UseNpgsql(
-                connectionString,
-                npgsqlOptions =>
-                    npgsqlOptions
-                        .MapEnum<GameType>("game_type", "session_info", new EnumTranslator())
-                        .MapEnum<PlayerRole>("player_role", "session_info", new EnumTranslator())
+                connectionString
+                // npgsqlOptions =>
+                //     npgsqlOptions
+                //         .MapEnum<GameType>("game_type", "session_info")
+                //         .MapEnum<PlayerRole>("player_role", "session_info")
             ));
 
         services.AddScoped<ISessionsApi, SessionsService>();
@@ -33,18 +30,5 @@ public static class SessionsModule
         //TODO: Authentication and Authorization
         
         return services;
-    }
-}
-
-class EnumTranslator : INpgsqlNameTranslator
-{
-    public string TranslateTypeName(string clrName)
-    {
-        return string.Concat(clrName[0].ToString().ToUpper(), clrName[1..]);
-    }
-
-    public string TranslateMemberName(string clrName)
-    {
-        return clrName.ToLower();
     }
 }

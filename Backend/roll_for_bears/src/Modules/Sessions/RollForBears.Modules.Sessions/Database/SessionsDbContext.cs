@@ -16,10 +16,8 @@ public partial class SessionsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresEnum("user_info", "game_type", ["campaign", "oneshot"]);
-        modelBuilder.HasPostgresEnum("user_info", "player_role", ["gamemaster", "player"]);
-        modelBuilder.HasPostgresEnum<GameType>(nameTranslator: new EnumTranslator());
-        modelBuilder.HasPostgresEnum<PlayerRole>(nameTranslator: new EnumTranslator());
+        modelBuilder.HasPostgresEnum<GameType>("session_info", "game_type");
+        modelBuilder.HasPostgresEnum<PlayerRole>("session_info", "player_role");
         
         modelBuilder.Entity<Session>(entity =>
         {
@@ -109,7 +107,6 @@ public partial class SessionsDbContext : DbContext
             entity.Property(e => e.Role)
                 .HasConversion<string>()
                 .HasColumnName("player_role")
-                .HasColumnType("player_role")
                 .IsRequired();
             
             entity.HasOne(e => e.Session).WithMany(e => e.Players)

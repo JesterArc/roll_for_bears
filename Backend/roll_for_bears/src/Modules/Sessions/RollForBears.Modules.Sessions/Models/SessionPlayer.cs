@@ -11,5 +11,4 @@ public partial class SessionPlayer
     public PlayerRole Role { get; set; }
     
     public virtual Session Session { get; set; } = null!;
-    //public virtual Account Account { get; set; } = null!;
 }

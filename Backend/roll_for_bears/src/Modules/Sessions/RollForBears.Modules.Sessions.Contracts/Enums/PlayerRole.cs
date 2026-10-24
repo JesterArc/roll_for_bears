@@ -2,6 +2,6 @@
 
 public enum PlayerRole
 {
-    Gamemaster,
-    Player
+    gamemaster,
+    player
 }

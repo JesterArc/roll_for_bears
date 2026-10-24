@@ -3,6 +3,7 @@ using RollForBears.Modules.Sessions.Contracts.Api;
 using RollForBears.Modules.Sessions.Contracts.DTOs;
 using RollForBears.Modules.Sessions.Contracts.Enums;
 using RollForBears.Modules.Sessions.Database;
+using RollForBears.Modules.Sessions.Models;
 using RollForBears.Modules.Users.Contracts.Api;
 
 namespace RollForBears.Modules.Sessions.Services;
@@ -10,12 +11,12 @@ namespace RollForBears.Modules.Sessions.Services;
 public class SessionsService : ISessionsApi
 {
     private readonly SessionsDbContext _dbContext;
-    //private readonly IUsersApi _userApi;
+    private readonly IUsersApi _userApi;
 
     public SessionsService(SessionsDbContext dbContext, IUsersApi userApi)
     {
         _dbContext = dbContext;
-        //_userApi = userApi;
+        _userApi = userApi;
     }
     
     public async Task CreateSessionAsync(SessionCreateRequestDto request)
@@ -23,52 +24,83 @@ public class SessionsService : ISessionsApi
         throw new NotImplementedException();
     }
 
-    public async Task<SessionInfoDto?> GetSessionInfoAsync(string sessionId)
+    public async Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ICollection<SessionInfoDto?>> GetSessionsAsync(int page, int pageSize)
+    public async Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId)
     {
-        var sessions = new List<SessionInfoDto?>();
-        await _dbContext.Sessions.Skip((page) * pageSize).Take(pageSize).ForEachAsync(
-            s =>
-            {
-                var session = new SessionInfoDto()
+        var session = await _dbContext.Sessions.Where(s => s.Uuid.ToString() == sessionId)
+            .FirstOrDefaultAsync();
+        if (session == null)
+        {
+            return null;
+        }
+        var specificSession = new SessionInfoSpecificDto()
+        {
+            Uuid = session.Uuid,
+            Name = session.Name,
+            Tagline = session.Tagline,
+            GameSystem = session.GameSystem,
+            GameType = session.GameType.ToString(),
+            OwnerUsername = "",
+            MinimalPlayers = session.MinimalPlayers,
+            MaximalPlayers = session.MaximalPlayers,
+            GameLanguage = session.GameLanguage,
+            NextSessionDate = session.NextSessionDate,
+            SessionDescription = session.SessionDescription,
+            Players = new List<SessionPlayerInfoDto>()
+        };
+        specificSession.OwnerUsername = await _userApi.GetPlayerUsernameAsync(session.OwnerUuid.ToString()) ?? "";
+        specificSession.Players = await GetSessionPlayerListAsync(sessionId);
+        return specificSession;
+    }
+
+    public async Task<ICollection<SessionInfoListViewDto?>> GetSessionsAsync(int page, int pageSize)
+    {
+        var sessions = new List<SessionInfoListViewDto?>();
+        try
+        {
+            sessions = (await _dbContext.Sessions
+                .Skip(page * pageSize)
+                .Take(pageSize)
+                .Select(s => new SessionInfoListViewDto()
                 {
                     Uuid = s.Uuid,
                     Name = s.Name,
                     Tagline = s.Tagline,
-                    IsGeneratingNotes = s.IsGeneratingNotes,
                     GameSystem = s.GameSystem,
-                    GameType = (s.GameType),
-                    MinimalPlayers = s.MinimalPlayers,
+                    GameType = s.GameType.ToString(),
                     MaximalPlayers = s.MaximalPlayers,
                     GameLanguage = s.GameLanguage,
-                    OwnerUsername = "cannot find user",
-                    SessionDescription = s.SessionDescription,
                     NextSessionDate = s.NextSessionDate,
-                    Players = new List<SessionPlayerInfoDto>()
-                };
-                session.Players = s.Players.Select(p => new SessionPlayerInfoDto()
-                {
-                    Username = "cannot find user",
-                    Role = p.Role
-                }).ToList();
-                sessions.Add(session);
-            }
-        );
+                    NumberOfPlayers = s.Players.Count
+                }).ToListAsync())!;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
         return sessions;
     }
 
-    public async Task<ICollection<SessionInfoDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request)
+    public async Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request)
     {
         throw new NotImplementedException();
     }
 
     public async Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId)
     {
-        throw new NotImplementedException();
+        var players = await _dbContext.SessionPlayers.Where(sp => sp.SessionId.ToString() == sessionId).ToListAsync();
+        var usernames = await _userApi.GetSessionPlayersUsernamesAsync(
+            players.Where(sp => sp.SessionId.ToString() == sessionId).Select(p => p.AccountId.ToString()).ToList()
+            );
+        return players.Select(sp => new SessionPlayerInfoDto()
+        {
+            Username = usernames[sp.AccountId.ToString()],
+            Role = sp.Role.ToString()
+        }).ToList();
     }
 
     public async Task AddPlayerToSessionAsync(string sessionId, string username)
@@ -91,7 +123,7 @@ public class SessionsService : ISessionsApi
         throw new NotImplementedException();
     }
 
-    public async Task<SessionInfoDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request)
+    public async Task<SessionInfoSpecificDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request)
     {
         throw new NotImplementedException();
     }

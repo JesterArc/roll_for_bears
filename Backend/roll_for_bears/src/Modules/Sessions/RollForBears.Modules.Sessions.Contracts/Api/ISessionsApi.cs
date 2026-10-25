@@ -5,7 +5,7 @@ namespace RollForBears.Modules.Sessions.Contracts.Api;
 
 public interface ISessionsApi
 {
-    Task CreateSessionAsync(SessionCreateRequestDto request);
+    Task<Guid> CreateSessionAsync(SessionCreateRequestDto request);
     
     Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId);
     Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId);

@@ -1,4 +1,5 @@
-﻿using RollForBears.Modules.Sessions.Contracts.Enums;
+﻿using System.Text.Json.Serialization;
+using RollForBears.Modules.Sessions.Contracts.Enums;
 
 namespace RollForBears.Modules.Sessions.Contracts.DTOs;
 

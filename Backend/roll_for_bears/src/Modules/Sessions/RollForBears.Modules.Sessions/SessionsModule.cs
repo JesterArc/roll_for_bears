@@ -17,12 +17,15 @@ public static class SessionsModule
             "DB_CONNECTION_STRING is not configured.");
         
         services.AddDbContext<SessionsDbContext>(options =>
+            options.UseNpgsql(connectionString));
+        
+        services.AddDbContext<SessionsDbContext>(options =>
             options.UseNpgsql(
-                connectionString
-                // npgsqlOptions =>
-                //     npgsqlOptions
-                //         .MapEnum<GameType>("game_type", "session_info")
-                //         .MapEnum<PlayerRole>("player_role", "session_info")
+                connectionString,
+                npgsqlOptions =>
+                    npgsqlOptions
+                        .MapEnum<GameType>("game_type", "session_info")
+                        .MapEnum<PlayerRole>("player_role", "session_info")
             ));
 
         services.AddScoped<ISessionsApi, SessionsService>();

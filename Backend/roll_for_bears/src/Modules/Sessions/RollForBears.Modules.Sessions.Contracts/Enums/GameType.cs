@@ -2,6 +2,6 @@
 
 public enum GameType
 {
-    campaign,
-    oneshot
+    Campaign,
+    Oneshot
 }

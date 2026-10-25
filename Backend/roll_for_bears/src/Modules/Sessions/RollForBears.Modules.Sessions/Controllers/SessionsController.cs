@@ -37,7 +37,7 @@ public sealed class SessionsController : ControllerBase
         }
     }
 
-    [HttpGet("{sessionId}")]
+    [HttpGet("{sessionId}", Name="GetSession")]
     public async Task<IActionResult> GetSpecificSessionAsync([FromRoute] string sessionId)
     {
         var source = new CancellationTokenSource();
@@ -57,9 +57,23 @@ public sealed class SessionsController : ControllerBase
         }
     }
 
-    [HttpPost("/create")]
-    public async Task<IActionResult> CreateSessionAsync([FromBody] SessionCreateRequestDto request)
+    [HttpPost]
+    public async Task<IActionResult> CreateSessionAsync([FromForm] SessionCreateRequestDto request)
     {
-        return Ok("Not implemented yet");
+        var source = new CancellationTokenSource();
+        try
+        {
+            source.CancelAfter(100000);
+            var newSessionUuid = await _sessionsApi.CreateSessionAsync(request);
+            return CreatedAtRoute("GetSession", new {sessionId = newSessionUuid.ToString()}, newSessionUuid);
+        }
+        catch (OperationCanceledException)
+        {
+            return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+        }
+        finally
+        {
+            source.Dispose();
+        }
     }
 }

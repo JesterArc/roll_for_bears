@@ -5,6 +5,7 @@ using RollForBears.Modules.Sessions.Contracts.Enums;
 using RollForBears.Modules.Sessions.Database;
 using RollForBears.Modules.Sessions.Models;
 using RollForBears.Modules.Users.Contracts.Api;
+using static System.Enum;
 
 namespace RollForBears.Modules.Sessions.Services;
 
@@ -19,9 +20,31 @@ public class SessionsService : ISessionsApi
         _userApi = userApi;
     }
     
-    public async Task CreateSessionAsync(SessionCreateRequestDto request)
+    public async Task<Guid> CreateSessionAsync(SessionCreateRequestDto request)
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
+        
+        
+        // TryParse(request.GameType, out GameType gameType);
+        var newSession = new Session()
+        {
+            Uuid = Guid.NewGuid(),
+            Name = request.Name,
+            Tagline = request.Tagline,
+            IsGeneratingNotes = request.IsGeneratingNotes,
+            GameSystem = request.GameSystem,
+            GameType = GameType.Campaign,
+            MinimalPlayers = request.MinimalPlayers,
+            MaximalPlayers = request.MaximalPlayers,
+            GameLanguage = request.GameLanguage,
+            OwnerUuid = request.OwnerUuid,
+            SessionDescription = request.GameDescription,
+            NextSessionDate = request.NextSessionDate
+        };
+        
+        await _dbContext.AddAsync(newSession);
+        await _dbContext.SaveChangesAsync();
+        return newSession.Uuid;
     }
 
     public async Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId)

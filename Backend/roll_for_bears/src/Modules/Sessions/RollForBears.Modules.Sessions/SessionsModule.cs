@@ -17,9 +17,6 @@ public static class SessionsModule
             "DB_CONNECTION_STRING is not configured.");
         
         services.AddDbContext<SessionsDbContext>(options =>
-            options.UseNpgsql(connectionString));
-        
-        services.AddDbContext<SessionsDbContext>(options =>
             options.UseNpgsql(
                 connectionString,
                 npgsqlOptions =>

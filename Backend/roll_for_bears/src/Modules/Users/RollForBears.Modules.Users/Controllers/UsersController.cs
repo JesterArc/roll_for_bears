@@ -17,16 +17,16 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult> RegisterAsync(RegisterRequestDto request)
+    public async Task<ActionResult> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
     {
-        await _usersApi.RegisterAsync(request);
+        await _usersApi.RegisterAsync(request, cancellationToken);
         return Ok();
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<LoginResultDto>> LoginAsync(LoginRequestDto request)
+    public async Task<ActionResult<LoginResultDto>> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken)
     {
-        var result = await _usersApi.LoginAsync(request);
+        var result = await _usersApi.LoginAsync(request, cancellationToken);
         if (result == null)
         {
             return Unauthorized();
@@ -43,13 +43,13 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<ActionResult<LoginResultDto>> RefreshTokenAsync(string refreshToken)
+    public async Task<ActionResult<LoginResultDto>> RefreshTokenAsync(CancellationToken cancellationToken)
     {
         string? token = Request.Cookies["refreshToken"];
         if (string.IsNullOrEmpty(token))
             return Unauthorized();
         
-        var result = await _usersApi.RefreshTokenAsync(token);
+        var result = await _usersApi.RefreshTokenAsync(token, cancellationToken);
         if (result == null)
         {
             return Unauthorized();
@@ -61,11 +61,11 @@ public sealed class UsersController : ControllerBase
     }
 
     [HttpPost("logout")]
-    public async Task<IActionResult> LogoutAsync(string refreshToken)
+    public async Task<IActionResult> LogoutAsync(CancellationToken cancellationToken)
     {
         string? token = Request.Cookies["refreshToken"];
         if (!string.IsNullOrEmpty(token))
-            await _usersApi.LogoutAsync(token);
+            await _usersApi.LogoutAsync(token, cancellationToken);
         
         Response.Cookies.Delete("refreshToken",
                 new CookieOptions

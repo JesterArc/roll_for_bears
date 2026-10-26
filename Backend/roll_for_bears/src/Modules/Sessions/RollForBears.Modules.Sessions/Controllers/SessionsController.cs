@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RollForBears.Modules.Sessions.Contracts.Api;
 using RollForBears.Modules.Sessions.Contracts.DTOs;
 using System.Threading;
+using Microsoft.AspNetCore.Http;
 
 namespace RollForBears.Modules.Sessions.Controllers;
 
@@ -18,13 +19,13 @@ public sealed class SessionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetSessionsAsync(int page=0, int pageSize=10)
+    public async Task<IActionResult> GetSessionsAsync(CancellationToken cancellationToken, int page=0, int pageSize=10)
     {
         var source = new CancellationTokenSource();
         try
         {
             source.CancelAfter(100000);
-            var sessions = await _sessionsApi.GetSessionsAsync(page, pageSize);
+            var sessions = await _sessionsApi.GetSessionsAsync(page, pageSize, cancellationToken);
             return Ok(sessions);
         }
         catch (OperationCanceledException)
@@ -38,42 +39,38 @@ public sealed class SessionsController : ControllerBase
     }
 
     [HttpGet("{sessionId}", Name="GetSession")]
-    public async Task<IActionResult> GetSpecificSessionAsync([FromRoute] string sessionId)
+    public async Task<IActionResult> GetSpecificSessionAsync([FromRoute] string sessionId, CancellationToken cancellationToken)
     {
-        var source = new CancellationTokenSource();
         try
         {
-            source.CancelAfter(100000);
-            var session = await _sessionsApi.GetSpecificSessionInfoAsync(sessionId);
+            var session = await _sessionsApi.GetSpecificSessionInfoAsync(sessionId, cancellationToken);
             return Ok(session);
         }
         catch (OperationCanceledException)
         {
-            return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
         }
-        finally
+        catch (Exception)
         {
-            source.Dispose();
+            return BadRequest("Failed to create session");
         }
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateSessionAsync([FromForm] SessionCreateRequestDto request)
+    public async Task<IActionResult> CreateSessionAsync([FromForm] SessionCreateRequestDto request, CancellationToken cancellationToken)
     {
-        var source = new CancellationTokenSource();
         try
         {
-            source.CancelAfter(100000);
-            var newSessionUuid = await _sessionsApi.CreateSessionAsync(request);
-            return CreatedAtRoute("GetSession", new {sessionId = newSessionUuid.ToString()}, newSessionUuid);
+            var newSessionUuid = await _sessionsApi.CreateSessionAsync(request, cancellationToken);
+            return CreatedAtRoute("GetSession", new { sessionId = newSessionUuid.ToString()}, newSessionUuid);
         }
         catch (OperationCanceledException)
         {
-            return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
         }
-        finally
+        catch (Exception)
         {
-            source.Dispose();
+            return BadRequest("Failed to create session");
         }
     }
 }

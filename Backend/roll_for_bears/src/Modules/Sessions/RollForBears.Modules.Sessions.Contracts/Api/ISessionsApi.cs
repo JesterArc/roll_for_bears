@@ -5,25 +5,24 @@ namespace RollForBears.Modules.Sessions.Contracts.Api;
 
 public interface ISessionsApi
 {
-    Task<Guid> CreateSessionAsync(SessionCreateRequestDto request);
+    Task<Guid> CreateSessionAsync(SessionCreateRequestDto request, CancellationToken cancellationToken);
     
-    Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId);
-    Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId);
+    Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId, CancellationToken cancellationToken);
+    Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId, CancellationToken cancellationToken);
     
-    Task<ICollection<SessionInfoListViewDto?>> GetSessionsAsync(int page, int pageSize);
+    Task<ICollection<SessionInfoListViewDto?>> GetSessionsAsync(int page, int pageSize, CancellationToken cancellationToken);
     
-    Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request);
+    Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request, CancellationToken cancellationToken);
     
-    Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId);
+    Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId, CancellationToken cancellationToken);
     
-    Task AddPlayerToSessionAsync(string sessionId, string username);
-    Task AddPlayerToSessionAsync(string sessionId, string username, PlayerRole playerRole);
+    Task<Guid> AddPlayerToSessionAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken);
     
-    Task ChangePlayerRoleAsync(string sessionId, string username, PlayerRole playerRole);
+    Task<Guid> ChangePlayerRoleAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken);
     
-    Task RemovePlayerAsync(string sessionId, string username);
+    Task<Guid> RemovePlayerAsync(SessionPlayerRemoveDto dto, CancellationToken cancellationToken);
     
-    Task<SessionInfoSpecificDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request);
+    Task<SessionInfoSpecificDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request, CancellationToken cancellationToken);
     
-    Task DeleteSessionAsync(string sessionId);
+    Task DeleteSessionAsync(string sessionId, CancellationToken cancellationToken);
 }

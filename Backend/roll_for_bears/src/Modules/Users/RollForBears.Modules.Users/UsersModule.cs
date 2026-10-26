@@ -17,9 +17,6 @@ public static class UsersModule
     {
         var connectionString = configuration["DB_CONNECTION_STRING"] ?? throw new InvalidOperationException(
             "DB_CONNECTION_STRING is not configured.");
-
-        services.AddDbContext<UsersDbContext>(options =>
-            options.UseNpgsql(connectionString));
         
         services.AddDbContext<UsersDbContext>(options =>
             options.UseNpgsql(

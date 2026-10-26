@@ -27,16 +27,16 @@ internal sealed class UsersService : IUsersApi
         _refreshTokenGenerator = refreshTokenGenerator;
     }
 
-    public async Task RegisterAsync(RegisterRequestDto request)
+    public async Task RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
     {
-        bool emailExists = await _dbContext.Accounts.AnyAsync(a => a.Email == request.Email);
+        bool emailExists = await _dbContext.Accounts.AnyAsync(a => a.Email == request.Email, cancellationToken);
 
         if (emailExists)
         {
             throw new InvalidOperationException("Email already exists");
         }
         
-        bool usernameExist = await _dbContext.Accounts.AnyAsync(a => a.Username == request.Username);
+        bool usernameExist = await _dbContext.Accounts.AnyAsync(a => a.Username == request.Username, cancellationToken);
 
         if (usernameExist)
         {
@@ -56,13 +56,13 @@ internal sealed class UsersService : IUsersApi
             Username = request.Username
         };
         _dbContext.Accounts.Add(account);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<LoginResultDto?> LoginAsync(LoginRequestDto request)
+    public async Task<LoginResultDto?> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken)
     {
         var account = await _dbContext.Accounts.AsNoTracking()
-            .SingleOrDefaultAsync(a => a.Username == request.Username);
+            .SingleOrDefaultAsync(a => a.Username == request.Username, cancellationToken);
 
         if (account == null)
             return null;
@@ -76,17 +76,17 @@ internal sealed class UsersService : IUsersApi
 
         string refreshToken = _refreshTokenGenerator.Generate();
         
-        await AddRefreshTokenToDb(refreshToken, account.Uuid);
+        await AddRefreshTokenToDb(refreshToken, account.Uuid, cancellationToken);
         
         return new LoginResultDto(account.Uuid, account.Username!, jwtToken, refreshToken);
     }
 
-    public async Task<LoginResultDto?> RefreshTokenAsync(string tokenRequest)
+    public async Task<LoginResultDto?> RefreshTokenAsync(string tokenRequest, CancellationToken cancellationToken)
     {
         string hash = _refreshTokenGenerator.Hash(tokenRequest);
         
         var refreshToken = await _dbContext.RefreshTokens.Include(rt => rt.Account)
-            .SingleOrDefaultAsync(rt => rt.TokenHash == hash);
+            .SingleOrDefaultAsync(rt => rt.TokenHash == hash, cancellationToken);
         DateTime currentTime = DateTime.UtcNow;
         if (refreshToken == null)
         {
@@ -105,7 +105,7 @@ internal sealed class UsersService : IUsersApi
             var revokedParam = new NpgsqlParameter("revokedAt", currentTime);
             var familyParam = new NpgsqlParameter("familyId", refreshToken.FamilyId);
             
-            await _dbContext.Database.ExecuteSqlRawAsync(querry, revokedParam, familyParam);
+            await _dbContext.Database.ExecuteSqlRawAsync(querry, revokedParam, familyParam, cancellationToken);
 
             return null;
         }
@@ -135,8 +135,8 @@ internal sealed class UsersService : IUsersApi
         refreshToken.RevokedAt = currentTime;
         refreshToken.ReplacedByTokenId = refreshTokenRecord.Uuid;
         
-        _dbContext.RefreshTokens.Add(refreshTokenRecord);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.RefreshTokens.AddAsync(refreshTokenRecord, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         
         var newLoginDto = new LoginResultDto(refreshToken.AccountId, refreshToken.Account.Username!,
             newJwtToken, newRefreshToken);
@@ -144,7 +144,7 @@ internal sealed class UsersService : IUsersApi
         return newLoginDto;
     }
 
-    public async Task LogoutAsync(string tokenRequest)
+    public async Task LogoutAsync(string tokenRequest, CancellationToken cancellationToken)
     {
         string tokenHash = _refreshTokenGenerator.Hash(tokenRequest);
         
@@ -163,22 +163,23 @@ internal sealed class UsersService : IUsersApi
         var revokedParam = new NpgsqlParameter("revokedAt", currentTime);
         var hashParam = new NpgsqlParameter("hash", tokenHash);
         
-        await _dbContext.Database.ExecuteSqlRawAsync(querry, revokedParam, hashParam);
+        await _dbContext.Database.ExecuteSqlRawAsync(querry, revokedParam, hashParam, cancellationToken);
     }
 
-    public async Task<string?> GetPlayerUsernameAsync(string playerUuid)
+    public async Task<string?> GetPlayerUsernameAsync(string playerUuid, CancellationToken cancellationToken)
     {
         return await _dbContext.Accounts.Where(a=> a.Uuid.ToString() == playerUuid).Select(a => a.Username)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Dictionary<string, string>> GetSessionPlayersUsernamesAsync(List<string> playerUuids)
+    public async Task<Dictionary<string, string>> GetSessionPlayersUsernamesAsync(List<string> playerUuids, CancellationToken cancellationToken)
     {
-        var accounts = await _dbContext.Accounts.Where(a => playerUuids.Contains(a.Uuid.ToString())).ToListAsync();
+        var accounts = await _dbContext.Accounts.Where(a => playerUuids.Contains(a.Uuid.ToString()))
+            .ToListAsync(cancellationToken);
         return accounts.ToDictionary(a => a.Uuid.ToString(), a => a.Username ?? "");
     }
 
-    private async Task AddRefreshTokenToDb(string token, Guid accountId)
+    private async Task AddRefreshTokenToDb(string token, Guid accountId, CancellationToken cancellationToken)
     {
         string hash = _refreshTokenGenerator.Hash(token);
         
@@ -197,6 +198,6 @@ internal sealed class UsersService : IUsersApi
         
         _dbContext.RefreshTokens.Add(refreshToken);
         
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

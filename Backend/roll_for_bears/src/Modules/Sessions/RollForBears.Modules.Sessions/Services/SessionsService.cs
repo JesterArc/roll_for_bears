@@ -20,12 +20,8 @@ public class SessionsService : ISessionsApi
         _userApi = userApi;
     }
     
-    public async Task<Guid> CreateSessionAsync(SessionCreateRequestDto request)
+    public async Task<Guid> CreateSessionAsync(SessionCreateRequestDto request, CancellationToken cancellationToken)
     {
-        // throw new NotImplementedException();
-        
-        
-        // TryParse(request.GameType, out GameType gameType);
         var newSession = new Session()
         {
             Uuid = Guid.NewGuid(),
@@ -33,29 +29,41 @@ public class SessionsService : ISessionsApi
             Tagline = request.Tagline,
             IsGeneratingNotes = request.IsGeneratingNotes,
             GameSystem = request.GameSystem,
-            GameType = GameType.Campaign,
+            GameType = request.GameType,
             MinimalPlayers = request.MinimalPlayers,
             MaximalPlayers = request.MaximalPlayers,
             GameLanguage = request.GameLanguage,
             OwnerUuid = request.OwnerUuid,
             SessionDescription = request.GameDescription,
-            NextSessionDate = request.NextSessionDate
+            NextSessionDate = request.NextSessionDate,
         };
+
+        newSession.Players =
+        [
+            new SessionPlayer()
+            {
+                AccountId = newSession.OwnerUuid,
+                ConnectionId = Guid.NewGuid(),
+                Role = request.PlayerRole,
+                SessionId = newSession.Uuid,
+                Session = newSession
+            }
+        ];
         
-        await _dbContext.AddAsync(newSession);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.AddAsync(newSession, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return newSession.Uuid;
     }
 
-    public async Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId)
+    public async Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId)
+    public async Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId, CancellationToken cancellationToken)
     {
         var session = await _dbContext.Sessions.Where(s => s.Uuid.ToString() == sessionId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
         if (session == null)
         {
             return null;
@@ -75,12 +83,12 @@ public class SessionsService : ISessionsApi
             SessionDescription = session.SessionDescription,
             Players = new List<SessionPlayerInfoDto>()
         };
-        specificSession.OwnerUsername = await _userApi.GetPlayerUsernameAsync(session.OwnerUuid.ToString()) ?? "";
-        specificSession.Players = await GetSessionPlayerListAsync(sessionId);
+        specificSession.OwnerUsername = await _userApi.GetPlayerUsernameAsync(session.OwnerUuid.ToString(), cancellationToken) ?? "";
+        specificSession.Players = await GetSessionPlayerListAsync(sessionId, cancellationToken);
         return specificSession;
     }
 
-    public async Task<ICollection<SessionInfoListViewDto?>> GetSessionsAsync(int page, int pageSize)
+    public async Task<ICollection<SessionInfoListViewDto?>> GetSessionsAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
         var sessions = new List<SessionInfoListViewDto?>();
         try
@@ -99,7 +107,7 @@ public class SessionsService : ISessionsApi
                     GameLanguage = s.GameLanguage,
                     NextSessionDate = s.NextSessionDate,
                     NumberOfPlayers = s.Players.Count
-                }).ToListAsync())!;
+                }).ToListAsync(cancellationToken))!;
         }
         catch (Exception ex)
         {
@@ -108,16 +116,16 @@ public class SessionsService : ISessionsApi
         return sessions;
     }
 
-    public async Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request)
+    public async Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId)
+    public async Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId, CancellationToken cancellationToken)
     {
-        var players = await _dbContext.SessionPlayers.Where(sp => sp.SessionId.ToString() == sessionId).ToListAsync();
+        var players = await _dbContext.SessionPlayers.Where(sp => sp.SessionId.ToString() == sessionId).ToListAsync(cancellationToken);
         var usernames = await _userApi.GetSessionPlayersUsernamesAsync(
-            players.Where(sp => sp.SessionId.ToString() == sessionId).Select(p => p.AccountId.ToString()).ToList()
+            players.Where(sp => sp.SessionId.ToString() == sessionId).Select(p => p.AccountId.ToString()).ToList(), cancellationToken
             );
         return players.Select(sp => new SessionPlayerInfoDto()
         {
@@ -126,32 +134,27 @@ public class SessionsService : ISessionsApi
         }).ToList();
     }
 
-    public async Task AddPlayerToSessionAsync(string sessionId, string username)
+    public async Task<Guid> AddPlayerToSessionAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public async Task AddPlayerToSessionAsync(string sessionId, string username, PlayerRole playerRole)
+    public async Task<Guid> ChangePlayerRoleAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public async Task ChangePlayerRoleAsync(string sessionId, string username, PlayerRole playerRole)
+    public async Task<Guid> RemovePlayerAsync(SessionPlayerRemoveDto dto, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public async Task RemovePlayerAsync(string sessionId, string username)
+    public async Task<SessionInfoSpecificDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<SessionInfoSpecificDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task DeleteSessionAsync(string sessionId)
+    public async Task DeleteSessionAsync(string sessionId, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

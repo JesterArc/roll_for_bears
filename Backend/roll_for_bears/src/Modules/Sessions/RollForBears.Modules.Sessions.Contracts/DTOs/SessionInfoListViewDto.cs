@@ -1,8 +1,6 @@
-﻿using RollForBears.Modules.Sessions.Contracts.Enums;
+﻿namespace RollForBears.Modules.Sessions.Contracts.DTOs;
 
-namespace RollForBears.Modules.Sessions.Contracts.DTOs;
-
-public class SessionInfoListViewDto
+public sealed class SessionInfoListViewDto
 {
     public Guid Uuid { get; set; }
     public required string Name { get; set; } = null!;

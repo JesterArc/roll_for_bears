@@ -50,7 +50,6 @@ public partial class SessionsDbContext : DbContext
                 .IsRequired();
             
             entity.Property(e => e.GameType)
-                .HasConversion<string>()
                 .HasColumnName("game_type")
                 .HasColumnType("game_type")
                 .IsRequired();
@@ -105,8 +104,8 @@ public partial class SessionsDbContext : DbContext
                 .IsRequired();
             
             entity.Property(e => e.Role)
-                .HasConversion<string>()
                 .HasColumnName("player_role")
+                .HasColumnType("player_role")
                 .IsRequired();
             
             entity.HasOne(e => e.Session).WithMany(e => e.Players)

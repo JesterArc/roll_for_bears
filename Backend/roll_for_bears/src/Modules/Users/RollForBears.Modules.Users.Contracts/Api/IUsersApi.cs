@@ -4,14 +4,14 @@ namespace RollForBears.Modules.Users.Contracts.Api;
 
 public interface IUsersApi
 {
-    Task RegisterAsync(RegisterRequestDto request);
+    Task RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken);
     
-    Task<LoginResultDto?> LoginAsync(LoginRequestDto request);
+    Task<LoginResultDto?> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken);
     
-    Task<LoginResultDto?> RefreshTokenAsync(string tokenRequest);
+    Task<LoginResultDto?> RefreshTokenAsync(string tokenRequest, CancellationToken cancellationToken);
     
-    Task LogoutAsync(string tokenRequest);
-    Task<string?> GetPlayerUsernameAsync(string playerUuid);
+    Task LogoutAsync(string tokenRequest, CancellationToken cancellationToken);
+    Task<string?> GetPlayerUsernameAsync(string playerUuid, CancellationToken cancellationToken);
     
-    Task<Dictionary<string, string>> GetSessionPlayersUsernamesAsync(List<string> playerUuids);
+    Task<Dictionary<string, string>> GetSessionPlayersUsernamesAsync(List<string> playerUuids, CancellationToken cancellationToken);
 }

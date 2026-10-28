@@ -122,3 +122,45 @@
 .sessions-actions-button:hover {
   background-color: dimgrey;
 }
+
+.sessions-dialog {
+  box-sizing: border-box;
+  width: min(750px, 94vw);
+  max-width: 94vw;
+  max-height: 90vh;
+  margin: auto;
+  padding: 16px;
+  border: none;
+  border-radius: 24px;
+  background-color: transparent;
+  overflow-y: auto;
+}
+
+.sessions-dialog::backdrop {
+  background-color: rgb(0 0 0 / 55%);
+}
+
+.sessions-dialog-header {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 12px;
+}
+
+.sessions-dialog-close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background-color: #efefef;
+  color: #2d2d2d;
+  font: inherit;
+  font-size: 24px;
+}
+
+.sessions-dialog-close-button:hover {
+  background-color: #e99e9e;
+}

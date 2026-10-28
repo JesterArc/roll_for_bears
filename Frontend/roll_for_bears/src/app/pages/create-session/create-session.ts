@@ -21,7 +21,7 @@ export class CreateSession {
       id: '1',
       name: 'RealUser123',
       role: 'GM',
-      isOwner: true
+      is_owner: true
     }
   ]
 

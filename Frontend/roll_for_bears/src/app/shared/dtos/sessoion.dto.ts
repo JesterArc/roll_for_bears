@@ -1,3 +1,5 @@
+import { SessionPlayerDto, SessionRole } from './session-player.dto';
+
 export interface SessionDto {
   id: string;
   name: string;
@@ -6,4 +8,8 @@ export interface SessionDto {
   playerSlots: string;
   language: string;
   date: string;
+
+  gameSystem?: string;
+  creatorRole?: SessionRole;
+  players?: SessionPlayerDto[];
 }

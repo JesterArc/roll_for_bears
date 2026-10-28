@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+.session-review-content {
+  padding: 12px 16px;
+  border: 2px solid #2e2e2e;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.session-review-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.session-review-avatar {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.session-review-name {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.session-review-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.session-review-star {
+  width: 18px;
+  height: 18px;
+}
+
+.session-review-title {
+  margin: 8px 0 4px;
+  font-size: 22px;
+}
+
+.session-review-text {
+  margin: 0;
+  font-style: italic;
+  line-height: 1.5;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}

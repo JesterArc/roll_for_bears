@@ -4,5 +4,5 @@ export interface SessionPlayerDto {
   id: string;
   name: string;
   role: SessionRole | null;
-  isOwner: boolean;
+  is_owner: boolean;
 }

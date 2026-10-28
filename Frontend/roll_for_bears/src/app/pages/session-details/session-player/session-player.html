@@ -1,0 +1,21 @@
+<div class="session-player-content">
+  <img class="session-player-avatar" src="/profile-round-1342-svgrepo-com.svg" alt="">
+
+  <span aria-hidden="true">•</span>
+
+  <span class="session-player-name">
+    {{ player.name }}
+  </span>
+
+  @if (player.is_owner) {
+    <img class="session-player-crown" src="/crown-svgrepo-com.svg" alt="(owner)">
+  }
+
+  <button
+    class="session-player-review-button"
+    type="button"
+    (click)="reviewPlayer()"
+  >
+    Review
+  </button>
+</div>

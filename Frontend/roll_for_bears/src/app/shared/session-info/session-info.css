@@ -1,0 +1,93 @@
+:host {
+  display: block;
+}
+
+.session-info-content {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 28px;
+  border-radius: 40px;
+  background-color: darkgrey;
+}
+
+.session-info-session-name {
+  margin-bottom: 32px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 750;
+}
+
+.session-info-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.session-info-details p {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.session-info-description {
+  font-size: 18px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.session-info-description span {
+  font-style: italic;
+  min-width: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.session-info-description strong {
+  flex-shrink: 0;
+}
+
+.session-info-join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-self: flex-end;
+  margin-top: 32px;
+  width: 200px;
+  max-width: 100%;
+}
+
+.session-info-join-form label {
+  font-size: 18px;
+}
+
+.session-info-role-select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 16px;
+  border: 2px solid;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 20px;
+}
+
+.session-info-join-button {
+  align-self: center;
+  padding: 14px 20px;
+  border: none;
+  background-color: #3d3d3d;
+  color: white;
+  border-radius: 12px;
+  width: 100%;
+  font: inherit;
+  font-size: 20px;
+}
+
+.session-info-join-button:hover {
+  background-color: #1F1F1F;
+  transform: translateY(-1px) translateX(-1px);
+}
+
+.session-info-role-select:focus-visible {
+  outline: none;
+}
+

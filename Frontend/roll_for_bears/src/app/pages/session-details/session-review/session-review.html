@@ -1,0 +1,32 @@
+<div class="session-review-content">
+
+  <section class="session-review-top">
+    <img class="session-review-avatar" src="/profile-round-1342-svgrepo-com.svg" alt="">
+
+    <span>
+      {{ review.reviewer_name }}
+    </span>
+
+    <span
+      class="session-review-rating"
+      role="img"
+    >
+      @for (star of stars; track star) {
+        @if (star <= review.rating){
+          <img class="session-review-star" src="/star-filled.svg" alt="">
+        } @else {
+          <img class="session-review-star" src="/star-not-filled.svg" alt="">
+        }
+      }
+    </span>
+  </section>
+
+  <h4 class="session-review-title">
+    {{ review.review_title }}
+  </h4>
+
+  <p class="session-review-text">
+    {{ review.review_content }}
+  </p>
+
+</div>

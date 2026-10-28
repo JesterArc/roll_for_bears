@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.session-player-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-player-avatar {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.session-player-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.session-player-crown {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.session-player-review-button {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 12px;
+  background-color: #2f2f2f;
+  color: white;
+  font: inherit;
+}
+
+.session-player-review-button:hover {
+  background-color: #1f1f1f;
+  transform: translateY(-1px) translateX(-1px);
+}

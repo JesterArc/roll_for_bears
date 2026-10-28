@@ -1,0 +1,65 @@
+<div class="session-info-content">
+  <h1 class="session-info-session-name">
+    {{ session.name }}
+  </h1>
+
+  <section class="session-info-details">
+    <p>
+      <strong>Game system:</strong>
+      {{ session.gameSystem ?? '-' }}
+    </p>
+
+    <p>
+      <strong>Game type:</strong>
+      {{ session.gameMode }}
+    </p>
+
+    <p>
+      <strong>Creator's role:</strong>
+      {{ session.creatorRole ?? '-' }}
+    </p>
+
+    <p>
+      <strong>Expected player count:</strong>
+      {{ session.playerSlots }}
+    </p>
+
+    <p>
+      <strong>Current player count:</strong>
+      {{ session.players?.length ?? '-' }}
+    </p>
+
+    <p>
+      <strong>Communication language:</strong>
+      {{ session.language }}
+    </p>
+  </section>
+
+  <p class="session-info-description">
+    <strong>Description:</strong>
+    <span>{{ session.description }}</span>
+  </p>
+
+  @if (showJoinForm) {
+    <form
+      class="session-info-join-form"
+      [formGroup]="joinForm"
+      (ngSubmit)="onSubmit()"
+    >
+      <label for="session-info-role">Join as:</label>
+
+      <select
+        id="session-info-role"
+        class="session-info-role-select"
+        formControlName="role"
+      >
+        <option value="GM">As GM</option>
+        <option value="Player">As Player</option>
+      </select>
+
+      <button class="session-info-join-button" type="submit">
+        Request join
+      </button>
+    </form>
+  }
+</div>

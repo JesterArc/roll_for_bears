@@ -20,7 +20,13 @@
         <div class="sessions-list">
           @for (session of recomendations; track session.id){
             <div class="sessions-list-row">
-              <div class="sessions-row-card">
+              <div
+                class="sessions-row-card"
+                role="button"
+                tabindex="0"
+                aria-haspopup="dialog"
+                (click)="openSessionInfo(session)"
+              >
                 <h3 class="sessions-row-title-mode">
                   {{ session.name }} ({{ session.gameMode }})
                 </h3>
@@ -34,7 +40,7 @@
                 </time>
               </div>
 
-              <button class="sessions-row-request" type="button" (click)="sendRequest(session.id)">
+              <button class="sessions-row-request" type="button" (click)="openSessionInfo(session)">
                 Send Request
               </button>
             </div>
@@ -48,9 +54,15 @@
         <h2>Others</h2>
       }
       <div class="sessions-list">
-        @for (session of recomendations; track session.id){
+        @for (session of otherSessions; track session.id){
           <div class="sessions-list-row">
-            <div class="sessions-row-card">
+            <div
+              class="sessions-row-card"
+              role="button"
+              tabindex="0"
+              aria-haspopup="dialog"
+              (click)="openSessionInfo(session)"
+            >
               <h3 class="sessions-row-title-mode">
                 {{ session.name }} ({{ session.gameMode }})
               </h3>
@@ -64,7 +76,7 @@
               </time>
             </div>
 
-            <button class="sessions-row-request" type="button" (click)="sendRequest(session.id)">
+            <button class="sessions-row-request" type="button" (click)="openSessionInfo(session)">
               Send Request
             </button>
           </div>
@@ -83,3 +95,28 @@
     </button>
   </div>
 </main>
+
+<dialog
+  #sessionDialog
+  class="sessions-dialog"
+  (close)="onSessionDialogClosed()"
+>
+  <div class="sessions-dialog-header">
+    <button
+      class="sessions-dialog-close-button"
+      type="button"
+      autofocus
+      (click)="closeSessionInfo()"
+    >
+      ✕
+    </button>
+  </div>
+
+  @if (selectedSession) {
+    <app-session-info
+      [session]="selectedSession"
+      [showJoinForm]="true"
+      (joinRequested)="sendRequest($event)"
+    ></app-session-info>
+  }
+</dialog>

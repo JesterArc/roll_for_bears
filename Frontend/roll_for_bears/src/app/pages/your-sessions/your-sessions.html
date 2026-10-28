@@ -11,8 +11,7 @@
     <div class="sessions-list">
       @for (session of sessions; track session.id) {
         <div class="sessions-list-row">
-          <div class="session-row-card" role="link" (click)="goToSessionDetails(session.id)"
-               (keydown.enter)="goToSessionDetails(session.id)">
+          <div class="session-row-card" role="link" (click)="goToSessionDetails(session.id)">
             <h2 class="session-row-title-mode">
               {{ session.name }} ({{ session.gameMode }})
             </h2>

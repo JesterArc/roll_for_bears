@@ -39,7 +39,4 @@ export class YourSessions {
   goToVtt(sessionId: string): void {
     this.router.navigate(['/vtt', sessionId]);
   }
-
-  protected readonly ongotpointercapture = ongotpointercapture;
-  protected readonly onkeydown = onkeydown;
 }

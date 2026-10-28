@@ -6,6 +6,7 @@ import { Homepage } from './pages/homepage/homepage';
 import { YourSessions } from './pages/your-sessions/your-sessions';
 import { Sessions } from './pages/sessions/sessions';
 import { CreateSession } from './pages/create-session/create-session';
+import { SessionDetails } from './pages/session-details/session-details';
 
 export const routes: Routes = [
   {
@@ -40,5 +41,9 @@ export const routes: Routes = [
   {
     path: 'create-session',
     component: CreateSession
+  },
+  {
+    path: 'session-details/:sessionId',
+    component: SessionDetails
   }
 ];

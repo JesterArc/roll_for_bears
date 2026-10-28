@@ -1,0 +1,45 @@
+<app-nav-bar></app-nav-bar>
+
+<main class="session-details-page">
+
+  <button
+    class="session-details-back-button"
+    type="button"
+    (click)="goBack()"
+  >
+    ←
+  </button>
+
+  <div class="session-details-content">
+
+    <div class="session-details-main">
+      <app-session-info [session]="session" [showJoinForm]="false"
+                        (joinRequested)="sendJoinRequest($event)"></app-session-info>
+
+      @if (reviews.length > 0) {
+        <section class="session-details-reviews">
+          <h2>Reviews:</h2>
+
+          <div class="session-details-reviews-list">
+            @for (review of reviews; track review) {
+              <app-session-review [review]="review"></app-session-review>
+            }
+          </div>
+        </section>
+      }
+
+    </div>
+
+    <div class="session-details-players">
+      <h2>Players:</h2>
+
+      <div class="session-details-players-list">
+        @for (player of session.players ?? []; track player.id) {
+          <app-session-player [player]="player" (reviewRequested)="reviewPlayer($event)"></app-session-player>
+        }
+      </div>
+    </div>
+  </div>
+
+
+</main>

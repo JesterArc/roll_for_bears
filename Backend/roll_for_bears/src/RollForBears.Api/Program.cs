@@ -26,7 +26,7 @@ builder.Services.AddScoped<IUserValidateService, UserValidateService>();
 builder.Services.AddDbContext<RollForBearsContext>(options =>
     options.UseNpgsql(
         Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"),
-        o => o.MapEnum<GameType>("game_type", "session_info")));
+        o => o.MapEnum<GameType>("game_type", "gameplay")));
 
 builder.Services.AddCors(options =>
 {

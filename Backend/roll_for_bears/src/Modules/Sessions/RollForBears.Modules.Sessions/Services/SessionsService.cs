@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RollForBears.Modules.Sessions.Contracts.Api;
 using RollForBears.Modules.Sessions.Contracts.DTOs;
-using RollForBears.Modules.Sessions.Contracts.Enums;
 using RollForBears.Modules.Sessions.Database;
 using RollForBears.Modules.Sessions.Models;
 using RollForBears.Modules.Users.Contracts.Api;
-using static System.Enum;
 
 namespace RollForBears.Modules.Sessions.Services;
 
@@ -37,7 +35,6 @@ public class SessionsService : ISessionsApi
             SessionDescription = request.GameDescription,
             NextSessionDate = request.NextSessionDate,
         };
-
         newSession.Players =
         [
             new SessionPlayer()
@@ -49,15 +46,9 @@ public class SessionsService : ISessionsApi
                 Session = newSession
             }
         ];
-        
         await _dbContext.AddAsync(newSession, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return newSession.Uuid;
-    }
-
-    public async Task<SessionInfoSpecificDto?> GetSessionInfoAsync(string sessionId, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId, CancellationToken cancellationToken)
@@ -81,19 +72,20 @@ public class SessionsService : ISessionsApi
             GameLanguage = session.GameLanguage,
             NextSessionDate = session.NextSessionDate,
             SessionDescription = session.SessionDescription,
-            Players = new List<SessionPlayerInfoDto>()
+            Players = new List<SessionPlayerInfoDto>(),
+            JoinRequests = new List<SessionJoinRequestInfoDto>()
         };
         specificSession.OwnerUsername = await _userApi.GetPlayerUsernameAsync(session.OwnerUuid.ToString(), cancellationToken) ?? "";
         specificSession.Players = await GetSessionPlayerListAsync(sessionId, cancellationToken);
+        specificSession.JoinRequests = await GetSessionJoinRequestListAsync(sessionId, cancellationToken);
         return specificSession;
     }
 
-    public async Task<ICollection<SessionInfoListViewDto?>> GetSessionsAsync(int page, int pageSize, CancellationToken cancellationToken)
+    public async Task<ICollection<SessionInfoListViewDto>> GetSessionsAsync(int page, int pageSize, 
+        CancellationToken cancellationToken)
     {
-        var sessions = new List<SessionInfoListViewDto?>();
-        try
-        {
-            sessions = (await _dbContext.Sessions
+        var sessions = 
+            await _dbContext.Sessions
                 .Skip(page * pageSize)
                 .Take(pageSize)
                 .Select(s => new SessionInfoListViewDto()
@@ -107,30 +99,66 @@ public class SessionsService : ISessionsApi
                     GameLanguage = s.GameLanguage,
                     NextSessionDate = s.NextSessionDate,
                     NumberOfPlayers = s.Players.Count
-                }).ToListAsync(cancellationToken))!;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+                }).ToListAsync(cancellationToken);
         return sessions;
     }
 
-    public async Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, SessionInfoFilteredRequestDto request, CancellationToken cancellationToken)
+    public async Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, 
+        SessionFilteredRequestDto request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var sessions = await _dbContext.Sessions
+            .Where(s => request.SessionName == null || s.Name.Contains(request.SessionName))
+            .Where(s => request.GameSystem == null || s.GameSystem.Contains(request.GameSystem))
+            .Where(s => request.GameType == null || s.GameType.ToString().Equals(request.GameType))
+            .Where(s => request.GameLanguage == null || s.GameLanguage.Equals(request.GameLanguage))
+            .Where(s => request.MinPlayers == null || s.MinimalPlayers >= request.MinPlayers)
+            .Where(s => request.MaxPlayers == null || s.MaximalPlayers <= request.MaxPlayers)
+            .Where(s=> request.IsGeneratingNotes == null || request.IsGeneratingNotes == s.IsGeneratingNotes)
+            .Where(s => request.SessionBeforeDate == null || request.SessionBeforeDate >= s.NextSessionDate)
+            .Where(s => request.SessionAfterDate == null || request.SessionAfterDate <= s.NextSessionDate)
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .Select(s => new SessionInfoListViewDto()
+            {
+                Uuid = s.Uuid,
+                Name = s.Name,
+                Tagline = s.Tagline,
+                GameSystem = s.GameSystem,
+                GameType = s.GameType.ToString(),
+                MaximalPlayers = s.MaximalPlayers,
+                GameLanguage = s.GameLanguage,
+                NextSessionDate = s.NextSessionDate,
+                NumberOfPlayers = s.Players.Count
+            }).ToListAsync(cancellationToken);
+        return sessions;
     }
 
-    public async Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId, CancellationToken cancellationToken)
+    public async Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId, 
+        CancellationToken cancellationToken)
     {
-        var players = await _dbContext.SessionPlayers.Where(sp => sp.SessionId.ToString() == sessionId).ToListAsync(cancellationToken);
+        var players = await _dbContext.SessionPlayers.Where(sp => sp.SessionId.ToString() == sessionId)
+            .ToListAsync(cancellationToken);
         var usernames = await _userApi.GetSessionPlayersUsernamesAsync(
-            players.Where(sp => sp.SessionId.ToString() == sessionId).Select(p => p.AccountId.ToString()).ToList(), cancellationToken
-            );
-        return players.Select(sp => new SessionPlayerInfoDto()
+            players.Where(sp => sp.SessionId.ToString() == sessionId)
+                             .Select(p => p.AccountId.ToString()).ToList(), cancellationToken);
+        return players.Select(sp => new SessionPlayerInfoDto
         {
             Username = usernames[sp.AccountId.ToString()],
             Role = sp.Role.ToString()
+        }).ToList();
+    }
+    
+    public async Task<ICollection<SessionJoinRequestInfoDto>> GetSessionJoinRequestListAsync(string sessionId, CancellationToken cancellationToken)
+    {
+        var players = await _dbContext.JoinRequests.Where(sp => sp.SessionUuid.ToString() == sessionId)
+            .ToListAsync(cancellationToken);
+        var usernames = await _userApi.GetSessionPlayersUsernamesAsync(
+            players.Where(sp => sp.SessionUuid.ToString() == sessionId)
+                .Select(p => p.AccountUuid.ToString()).ToList(), cancellationToken);
+        return players.Select(sp => new SessionJoinRequestInfoDto()
+        {
+            Username = usernames[sp.AccountUuid.ToString()],
+            Role = sp.PlayerRole.ToString()
         }).ToList();
     }
 

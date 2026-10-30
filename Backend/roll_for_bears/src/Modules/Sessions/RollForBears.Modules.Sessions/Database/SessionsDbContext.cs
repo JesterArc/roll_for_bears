@@ -13,17 +13,18 @@ public partial class SessionsDbContext : DbContext
     
     public virtual DbSet<Session> Sessions { get; set; }
     public virtual DbSet<SessionPlayer> SessionPlayers { get; set; }
+    public virtual DbSet<JoinRequest> JoinRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresEnum<GameType>("session_info", "game_type");
-        modelBuilder.HasPostgresEnum<PlayerRole>("session_info", "player_role");
+        modelBuilder.HasPostgresEnum<GameType>("gameplay", "game_type");
+        modelBuilder.HasPostgresEnum<PlayerRole>("gameplay", "player_role");
         
         modelBuilder.Entity<Session>(entity =>
         {
             entity.HasKey(e => e.Uuid).HasName("session_details_pkey");
 
-            entity.ToTable("session_details", "session_info");
+            entity.ToTable("session_details", "gameplay");
             
             entity.Property(e => e.Uuid)
                 .ValueGeneratedNever()
@@ -86,9 +87,9 @@ public partial class SessionsDbContext : DbContext
         {
             entity.HasKey(e => e.ConnectionId).HasName("session_players_pkey");
 
-            entity.ToTable("session_players", "session_info");
+            entity.ToTable("session_players", "gameplay");
 
-            entity.HasIndex(e => new {e.AccountId, e.SessionId}, "account_session_unique").IsUnique();
+            entity.HasIndex(e => new {e.AccountId, e.SessionId}, "account_session_session_players_unique").IsUnique();
             
             entity.Property(e => e.ConnectionId)
                 .ValueGeneratedNever()
@@ -113,6 +114,40 @@ public partial class SessionsDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("session_uuid_fkey");
         });
+
+        modelBuilder.Entity<JoinRequest>(entity =>
+        {
+            entity.HasKey(e => e.ConnectionUuid).HasName("join_requests_pkey");
+
+            entity.ToTable("join_requests", "gameplay");
+
+            entity.HasIndex(e => new { e.AccountUuid, e.SessionUuid }, "account_session_join_request_unique")
+                .IsUnique();
+
+            entity.Property(e => e.ConnectionUuid)
+                .ValueGeneratedNever()
+                .HasColumnName("connection_uuid")
+                .IsRequired();
+            
+            entity.Property(e => e.AccountUuid)
+                .HasColumnName("account_uuid")
+                .IsRequired();
+
+            entity.Property(e => e.SessionUuid)
+                .HasColumnName("session_uuid")
+                .IsRequired();
+
+            entity.Property(e => e.PlayerRole)
+                .HasColumnName("player_role")
+                .HasColumnType("player_role")
+                .IsRequired();
+
+            entity.HasOne(e => e.Session).WithMany(e => e.JoinRequests)
+                .HasForeignKey(e => e.SessionUuid)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("session_uuid_fkey");
+        });
+        
         OnModelCreatingPartial(modelBuilder);
     }
     

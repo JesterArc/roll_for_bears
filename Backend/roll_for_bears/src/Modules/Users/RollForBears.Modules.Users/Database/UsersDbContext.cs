@@ -13,6 +13,8 @@ public partial class UsersDbContext : DbContext
     public virtual DbSet<Account> Accounts { get; set; }
     
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+    
+    //public virtual DbSet
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

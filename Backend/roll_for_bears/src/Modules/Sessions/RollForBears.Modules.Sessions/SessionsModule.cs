@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
 using RollForBears.Modules.Sessions.Contracts.Enums;
 using RollForBears.Modules.Sessions.Database;
 using RollForBears.Modules.Sessions.Contracts.Api;
@@ -21,8 +20,8 @@ public static class SessionsModule
                 connectionString,
                 npgsqlOptions =>
                     npgsqlOptions
-                        .MapEnum<GameType>("game_type", "session_info")
-                        .MapEnum<PlayerRole>("player_role", "session_info")
+                        .MapEnum<GameType>("game_type", "gameplay")
+                        .MapEnum<PlayerRole>("player_role", "gameplay")
             ));
 
         services.AddScoped<ISessionsApi, SessionsService>();

@@ -179,6 +179,13 @@ internal sealed class UsersService : IUsersApi
         return accounts.ToDictionary(a => a.Uuid.ToString(), a => a.Username ?? "");
     }
 
+    public async Task<Dictionary<string, string>> GetJoinRequestsUsernamesAsync(List<string> requestUuids, CancellationToken cancellationToken)
+    {
+        var accounts = await _dbContext.Accounts.Where(a => requestUuids.Contains(a.Uuid.ToString()))
+            .ToListAsync(cancellationToken);
+        return accounts.ToDictionary(a => a.Uuid.ToString(), a => a.Username ?? "");
+    }
+
     private async Task AddRefreshTokenToDb(string token, Guid accountId, CancellationToken cancellationToken)
     {
         string hash = _refreshTokenGenerator.Hash(token);

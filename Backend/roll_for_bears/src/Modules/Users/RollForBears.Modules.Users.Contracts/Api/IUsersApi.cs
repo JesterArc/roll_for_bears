@@ -14,4 +14,5 @@ public interface IUsersApi
     Task<string?> GetPlayerUsernameAsync(string playerUuid, CancellationToken cancellationToken);
     
     Task<Dictionary<string, string>> GetSessionPlayersUsernamesAsync(List<string> playerUuids, CancellationToken cancellationToken);
+    Task<Dictionary<string, string>> GetJoinRequestsUsernamesAsync(List<string> requestUuids, CancellationToken cancellationToken);
 }

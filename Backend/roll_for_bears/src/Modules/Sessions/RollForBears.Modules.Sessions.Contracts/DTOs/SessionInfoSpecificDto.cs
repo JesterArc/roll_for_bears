@@ -14,6 +14,8 @@ public sealed class SessionInfoSpecificDto
     public required string OwnerUsername { get; set; } = null!;
     public required string SessionDescription { get; set; } = null!;
     public DateTime? NextSessionDate { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime LastUpdatedAt { get; set; }
     public ICollection<SessionPlayerInfoDto> Players { get; set; } = new List<SessionPlayerInfoDto>();
     public ICollection<SessionJoinRequestInfoDto> JoinRequests { get; set; } = new List<SessionJoinRequestInfoDto>();
 }

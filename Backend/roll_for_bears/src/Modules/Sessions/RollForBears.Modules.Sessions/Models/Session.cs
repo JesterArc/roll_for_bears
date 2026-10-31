@@ -18,6 +18,8 @@ public partial class Session
     public required Guid OwnerUuid { get; set; }
     public required string SessionDescription { get; set; } = null!;
     public DateTime? NextSessionDate { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime LastUpdatedAt { get; set; }
     
     public virtual ICollection<SessionPlayer> Players { get; set; } = new List<SessionPlayer>();
     public virtual ICollection<JoinRequest> JoinRequests { get; set; } = new List<JoinRequest>();

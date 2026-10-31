@@ -11,4 +11,5 @@ public sealed class SessionInfoListViewDto
     public required int MaximalPlayers { get; set; }
     public required string GameLanguage { get; set; } = null!;
     public DateTime? NextSessionDate { get; set; }
+    public DateTime LastUpdatedAt { get; set; }
 }

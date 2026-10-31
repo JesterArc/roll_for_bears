@@ -77,10 +77,18 @@ public partial class SessionsDbContext : DbContext
             
             entity.Property(e => e.NextSessionDate)
                 .HasColumnName("next_session_date")
-                .HasColumnType("date")
+                .HasColumnType("timestamp(0) with time zone")
                 .IsRequired(false);
             
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasColumnType("timestamp(0) with time zone")
+                .IsRequired();
             
+            entity.Property(e => e.LastUpdatedAt)
+                .HasColumnName("last_updated_at")
+                .HasColumnType("timestamp(0) with time zone")
+                .IsRequired();
         });
 
         modelBuilder.Entity<SessionPlayer>(entity =>

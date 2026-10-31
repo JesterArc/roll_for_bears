@@ -20,6 +20,7 @@ public class SessionsService : ISessionsApi
     
     public async Task<Guid> CreateSessionAsync(SessionCreateRequestDto request, CancellationToken cancellationToken)
     {
+        var time = DateTime.UtcNow;
         var newSession = new Session()
         {
             Uuid = Guid.NewGuid(),
@@ -34,6 +35,8 @@ public class SessionsService : ISessionsApi
             OwnerUuid = request.OwnerUuid,
             SessionDescription = request.GameDescription,
             NextSessionDate = request.NextSessionDate,
+            CreatedAt = time,
+            LastUpdatedAt = time
         };
         newSession.Players =
         [
@@ -64,6 +67,7 @@ public class SessionsService : ISessionsApi
             Uuid = session.Uuid,
             Name = session.Name,
             Tagline = session.Tagline,
+            IsGeneratingNotes = session.IsGeneratingNotes,
             GameSystem = session.GameSystem,
             GameType = session.GameType.ToString(),
             OwnerUsername = "",
@@ -72,6 +76,8 @@ public class SessionsService : ISessionsApi
             GameLanguage = session.GameLanguage,
             NextSessionDate = session.NextSessionDate,
             SessionDescription = session.SessionDescription,
+            CreatedAt = session.CreatedAt,
+            LastUpdatedAt = session.LastUpdatedAt,
             Players = new List<SessionPlayerInfoDto>(),
             JoinRequests = new List<SessionJoinRequestInfoDto>()
         };
@@ -98,7 +104,8 @@ public class SessionsService : ISessionsApi
                     MaximalPlayers = s.MaximalPlayers,
                     GameLanguage = s.GameLanguage,
                     NextSessionDate = s.NextSessionDate,
-                    NumberOfPlayers = s.Players.Count
+                    NumberOfPlayers = s.Players.Count,
+                    LastUpdatedAt = s.LastUpdatedAt
                 }).ToListAsync(cancellationToken);
         return sessions;
     }
@@ -128,7 +135,8 @@ public class SessionsService : ISessionsApi
                 MaximalPlayers = s.MaximalPlayers,
                 GameLanguage = s.GameLanguage,
                 NextSessionDate = s.NextSessionDate,
-                NumberOfPlayers = s.Players.Count
+                NumberOfPlayers = s.Players.Count,
+                LastUpdatedAt = s.LastUpdatedAt
             }).ToListAsync(cancellationToken);
         return sessions;
     }

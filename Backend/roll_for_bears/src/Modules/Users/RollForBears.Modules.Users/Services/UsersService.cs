@@ -96,7 +96,7 @@ internal sealed class UsersService : IUsersApi
         if (refreshToken.RevokedAt != null)
         {
             const string querry = """
-                                  UPDATE user_info.refresh_token
+                                  UPDATE users.refresh_token
                                   SET revoked_at = @revokedAt
                                   WHERE family_uuid = @familyId
                                   AND revoked_at IS NULL;
@@ -151,10 +151,10 @@ internal sealed class UsersService : IUsersApi
         DateTime currentTime = DateTime.UtcNow;
 
         const string querry = """
-                              UPDATE user_info.refresh_token
+                              UPDATE users.refresh_token
                               SET revoked_at = @revokedAt
                               WHERE family_uuid = (
-                                  SELECT t.family_uuid FROM user_info.refresh_token t
+                                  SELECT t.family_uuid FROM users.refresh_token t
                                                     WHERE t.token_hash = @hash
                                                     LIMIT 1)
                               AND revoked_at IS NULL;

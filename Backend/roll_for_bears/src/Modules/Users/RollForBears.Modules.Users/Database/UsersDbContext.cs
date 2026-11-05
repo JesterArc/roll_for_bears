@@ -14,6 +14,8 @@ public partial class UsersDbContext : DbContext
     
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     
+    public virtual DbSet<Friend> Friends { get; set; }
+    
     //public virtual DbSet
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,7 +26,7 @@ public partial class UsersDbContext : DbContext
         {
             entity.HasKey(e => e.Uuid).HasName("account_pkey");
             
-            entity.ToTable("account", "user_info");
+            entity.ToTable("account", "users");
 
             entity.HasIndex(e => e.Email, "account_email_unique").IsUnique();
             
@@ -56,7 +58,7 @@ public partial class UsersDbContext : DbContext
         {
             entity.HasKey(e => e.Uuid).HasName("refresh_token_pkey");
 
-            entity.ToTable("refresh_token", "user_info");
+            entity.ToTable("refresh_token", "users");
 
             entity.HasIndex(e => e.TokenHash, "refresh_token_token_hash_unique").IsUnique();
 
@@ -102,6 +104,42 @@ public partial class UsersDbContext : DbContext
                 .HasConstraintName("refresh_token_replaced_by_token_fkey");
         });
 
+        modelBuilder.Entity<Friend>(entity =>
+        {
+            entity.HasKey(e => e.FriendshipUuid).HasName("friends_pkey");
+
+            entity.ToTable("friends", "users");
+
+            entity.ToTable(t =>
+                t.HasCheckConstraint("different_users_check", "user_uuid <> friend_uuid"));
+
+            entity.HasIndex(e => new { user_uuid=e.UserUuid, friend_uuid=e.FriendUuid }, "friends_user_friend_unique")
+                .HasMethod("(greatest(user_uuid, friend_uuid), least(user_uuid, friend_uuid))")
+                .IsUnique();
+
+            entity.Property(e => e.FriendshipUuid)
+                .ValueGeneratedNever()
+                .HasColumnName("friendship_uuid");
+
+            entity.Property(e => e.UserUuid)
+                .HasColumnName("user_uuid");
+
+            entity.Property(e => e.FriendUuid)
+                .HasColumnName("friend_uuid");
+
+            entity.Property(e => e.FriendshipMutual)
+                .HasColumnName("friendship_mutual")
+                .HasDefaultValueSql("false");
+
+            entity.HasOne(e => e.User).WithMany(p => p.Friends)
+                .HasForeignKey(e => e.UserUuid)
+                .HasConstraintName("account_user_uuid_fkey");
+
+            entity.HasOne(e => e.UsersFriend).WithMany(p => p.FriendOf)
+                .HasForeignKey(e => e.FriendUuid)
+                .HasConstraintName("account_friend_uuid_fkey");
+        });
+        
         OnModelCreatingPartial(modelBuilder);
     }
 

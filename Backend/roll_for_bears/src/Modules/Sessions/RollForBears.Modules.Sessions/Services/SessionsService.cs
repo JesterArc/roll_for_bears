@@ -94,6 +94,7 @@ public class SessionsService : ISessionsApi
             await _dbContext.Sessions
                 .Skip(page * pageSize)
                 .Take(pageSize)
+                .OrderBy(s => s.CreatedAt)
                 .Select(s => new SessionInfoListViewDto()
                 {
                     Uuid = s.Uuid,
@@ -125,6 +126,7 @@ public class SessionsService : ISessionsApi
             .Where(s => request.SessionAfterDate == null || request.SessionAfterDate <= s.NextSessionDate)
             .Skip(page * pageSize)
             .Take(pageSize)
+            .OrderBy(s => s.CreatedAt)
             .Select(s => new SessionInfoListViewDto()
             {
                 Uuid = s.Uuid,

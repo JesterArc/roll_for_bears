@@ -18,4 +18,7 @@ public partial class Account
 
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public AccountStatus Status { get; set; }
+    
+    public virtual ICollection<Friend> Friends { get; set; } = new List<Friend>();
+    public virtual ICollection<Friend> FriendOf { get; set; } = new List<Friend>();
 }

@@ -22,7 +22,7 @@ public static class UsersModule
             options.UseNpgsql(
                 connectionString,
                 npgsqlOptions =>
-                    npgsqlOptions.MapEnum<AccountStatus>("status")
+                    npgsqlOptions.MapEnum<AccountStatus>("status", "users")
             ));
 
         services.AddScoped<IUsersApi, UsersService>();

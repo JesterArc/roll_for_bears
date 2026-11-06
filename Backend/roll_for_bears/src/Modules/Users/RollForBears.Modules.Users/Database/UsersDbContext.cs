@@ -20,7 +20,7 @@ public partial class UsersDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresEnum("status", new[] { "active", "pending", "suspended", "banned" });
+        modelBuilder.HasPostgresEnum("users", "status", new[] { "active", "pending", "suspended", "banned" });
 
         modelBuilder.Entity<Account>(entity =>
         {
@@ -48,7 +48,7 @@ public partial class UsersDbContext : DbContext
             
             entity.Property(e => e.Status)
                 .HasColumnName("status")
-                .HasColumnType("status")
+                .HasColumnType("users.status")
                 .HasDefaultValueSql("'pending'");
             
             entity.Property(e => e.Username).HasMaxLength(20).HasColumnName("username");

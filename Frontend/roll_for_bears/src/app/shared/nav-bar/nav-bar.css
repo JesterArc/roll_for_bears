@@ -5,11 +5,16 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  background-color: white;
+  background-color: var(--rfb-nav-bar-background);
   box-sizing: border-box;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
   position: relative;
   z-index: 1000;
+  border-bottom: 1px solid var(--rfb-border-grey);
+}
+
+.logo span {
+  color: var(--rfb-purple-soft-text);
 }
 
 .navbar-left {
@@ -26,7 +31,7 @@
 
 .logo {
   font-size: 36px;
-  color: black;
+  color: var(--rfb-primary-text);
   font-weight: bold;
   margin-left: 10px;
 }
@@ -40,16 +45,16 @@
   align-items: center;
   gap: 8px;
   padding: 8px;
-  background-color: white;
+  background-color: var(--rfb-component-background-grey);
   border: none;
   border-radius: 8px;
-  color: black;
+  color: var(--rfb-primary-text);
   font-size: 16px;
   font-weight: 600;
 }
 
 .create-button:hover {
-  background-color: whitesmoke;
+  background-color: var(--rfb-component-background-grey-hover);
 }
 
 .dropdown-arrow {
@@ -72,8 +77,9 @@
   left: 0;
   min-width: 160px;
   padding: 8px;
-  background-color: white;
-  border: solid 1.5px black;
+  background-color: var(--rfb-component-background-grey);
+  border: 1px solid var(--rfb-border-grey);
+  color: var(--rfb-primary-text);
   border-radius: 8px;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
@@ -89,27 +95,51 @@
   border-radius: 8px;
   text-align: left;
   font-size: 16px;
+  color: inherit;
 }
 
 .create-dropdown-option:hover {
-  background-color: whitesmoke;
+  background-color: var(--rfb-component-background-grey-hover);
+}
+
+.create-dropdown-menu hr {
+  border: none;
+  border-top: 1px solid var(--rfb-border-grey);
+  margin: 8px 0;
 }
 
 .navbar-link {
   border: none;
   padding: 8px;
   gap: 8px;
-  background-color: white;
+  background-color: var(--rfb-component-background-grey);
   border-radius: 8px;
   position: relative;
-  color: black;
+  color: var(--rfb-primary-text);
   font-size: 16px;
   font-weight: 600;
   text-decoration: none;
 }
 
 .navbar-link:hover {
-  background-color: whitesmoke;
+  background-color: var(--rfb-component-background-grey-hover);
+}
+
+.navbar-link-active {
+  background-color: var(--rfb-soft-purple-hover);
+  color: var(--rfb-purple-soft-text);
+  box-shadow: 0 2px 0 var(--rfb-strong-purple);
+
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+
+.navbar-link-active:hover {
+  transform: translateY(-1px);
+  background-color: var(--rfb-soft-purple);
+  box-shadow: 0 3px 0 var(--rfb-strong-purple);
 }
 
 .notification-button,
@@ -126,15 +156,36 @@
   border-radius: 50%;
 }
 
+.navbar-icon {
+  display: block;
+  width: 26px;
+  height: 26px;
+  background-color: var(--rfb-primary-text);
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+}
+
+.icon-notification {
+  mask-image: url("/notification-4-svgrepo-com.svg");
+}
+
+.icon-profile {
+  mask-image: url("/profile-round-1342-svgrepo-com.svg");
+}
+
+.icon-logout {
+  mask-image: url("/logout-svgrepo-com.svg");
+}
+
 .notification-button:hover,
 .profile-button:hover,
 .logout-button:hover {
-  background-color: whitesmoke;
+  background-color: var(--rfb-component-background-grey-hover);
 }
 
-.notification-button img,
-.profile-button img,
-.logout-button img {
-  width: 26px;
-  height: 26px;
+.notification-button:hover .navbar-icon,
+.profile-button:hover .navbar-icon,
+.logout-button:hover .navbar-icon {
+  background-color: var(--rfb-purple-soft-text);
 }

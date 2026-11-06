@@ -2,7 +2,7 @@
 
   <div class="navbar-left">
     <a class="logo">
-      Roll For Bears
+      Roll For <span>Bears</span>
     </a>
 
     <div class="create-dropdown">
@@ -28,22 +28,22 @@
       }
     </div>
 
-    <button class="navbar-link" routerLink="/sessions">Sessions</button>
+    <button class="navbar-link" routerLink="/sessions" routerLinkActive="navbar-link-active">Sessions</button>
 
     <button class="navbar-link" routerLink="/marketplace">Marketplace</button>
   </div>
 
   <div class="navbar-right">
-    <button type="button" class="notification-button">
-      <img src="/notification-4-svgrepo-com.svg" role="button" alt="notification">
+    <button type="button" class="notification-button" aria-label="Powiadomienia">
+      <span class="navbar-icon icon-notification" aria-hidden="true"></span>
     </button>
 
-    <button type="button" class="profile-button">
-      <img src="/profile-round-1342-svgrepo-com.svg" role="button" alt="profile">
+    <button type="button" class="profile-button" aria-label="Profil">
+      <span class="navbar-icon icon-profile" aria-hidden="true"></span>
     </button>
 
-    <button type="button" class="logout-button">
-      <img src="/logout-svgrepo-com.svg" role="button" alt="logout">
+    <button type="button" class="logout-button" aria-label="Wyloguj">
+      <span class="navbar-icon icon-logout" aria-hidden="true"></span>
     </button>
   </div>
 </div>

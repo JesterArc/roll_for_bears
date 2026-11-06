@@ -5,7 +5,8 @@
   grid-template-columns: minmax(0, 1fr) 10%;
   gap: 70px;
   padding: 50px 70px;
-  background: white;
+  background: var(--rfb-page-background);
+  color: var(--rfb-primary-text);
   min-height: calc(100vh - 6vh);
 }
 
@@ -37,8 +38,20 @@
   border-radius: 50%;
 }
 
+.sessions-filter-icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+  background-color: var(--rfb-primary-text);
+  mask: url("/filter-svgrepo-com.svg");
+}
+
 .sessions-filter-button:hover {
-  background-color: whitesmoke;
+  background-color: var(--rfb-component-background-grey-hover);
+}
+
+.sessions-filter-button:hover .sessions-filter-icon {
+  background-color: var(--rfb-purple-soft-text);
 }
 
 .sessions-group {
@@ -49,6 +62,7 @@
   margin-left: 10px;
   font-size: 16px;
   font-weight: 500;
+  color: var(--rfb-secondary-text);
 }
 
 .sessions-list {
@@ -66,10 +80,14 @@
 .sessions-row-card {
   display: grid;
   padding: 12px 16px;
-  background-color: gainsboro;
-  border: 1px solid black;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background-color: var(--rfb-component-background-grey);
+  border: 1px solid var(--rfb-border-grey);
+  border-left: 3px solid var(--rfb-border-purple);
   box-sizing: border-box;
+}
+
+.sessions-row-card:hover {
+  border-color: var(--rfb-border-purple);
 }
 
 .session-row-title-mode {
@@ -80,25 +98,28 @@
 
 .session-row-info {
   font-size: 14px;
+  color: var(--rfb-secondary-text);
 }
 
 .session-row-date {
   font-size: 14px;
+  color: var(--rfb-secondary-text);
 }
 
 .sessions-row-request {
   padding: 16px;
-  background-color: black;
-  color: white;
+  background-color: var(--rfb-soft-purple);
+  color: var(--rfb-purple-soft-text);
   border-radius: 8px;
-  border: none;
+  border: 1px solid var(--rfb-border-purple);
   font-size: 16px;
   font-weight: 500;
   white-space: nowrap;
+
 }
 
 .sessions-row-request:hover {
-  background-color: dimgrey;
+  background-color: var(--rfb-soft-purple-hover);
 }
 
 .sessions-actions {
@@ -110,17 +131,17 @@
 .sessions-actions-button {
   width: 100%;
   padding: 16px;
-  background-color: black;
-  color: white;
+  background-color: var(--rfb-component-background-grey);
+  color: var(--rfb-primary-text);
   border-radius: 8px;
-  border: none;
+  border: 1px solid var(--rfb-border-grey);
   font-size: 16px;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .sessions-actions-button:hover {
-  background-color: dimgrey;
+  background-color: var(--rfb-component-background-grey-hover);
 }
 
 .sessions-dialog {
@@ -163,4 +184,15 @@
 
 .sessions-dialog-close-button:hover {
   background-color: #e99e9e;
+}
+
+
+.sessions-create-button {
+  background-color: var(--rfb-strong-purple);
+  color: var(--rfb-primary-for-purple-components-text)
+}
+
+.sessions-create-button:hover {
+  background-color: var(--rfb-strong-purple);
+  box-shadow: inset 0 0 0 2px var(--rfb-purple-soft-text);
 }

@@ -8,8 +8,8 @@
     <div class="sessions-header">
       <h1>Active Sessions:</h1>
 
-      <button class="sessions-filter-button" type="button">
-        <img src="/filter-svgrepo-com.svg" alt="Filter">
+      <button class="sessions-filter-button" type="button" aria-label="Filter-icon">
+        <span class="sessions-filter-icon" aria-hidden="true"></span>
       </button>
     </div>
 
@@ -86,7 +86,7 @@
   </div>
 
   <div class="sessions-actions">
-    <button class="sessions-actions-button" type="button" (click)="goToCreateSession()">
+    <button class="sessions-actions-button sessions-create-button" type="button" (click)="goToCreateSession()">
       Create Session
     </button>
 

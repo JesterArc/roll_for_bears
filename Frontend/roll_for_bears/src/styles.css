@@ -1,3 +1,26 @@
+:root {
+  /*kolory backgroundow*/
+  --rfb-page-background: #191919;
+  --rfb-component-background-grey: #222222;
+  --rfb-component-background-grey-hover: #2a2a2a;
+  --rfb-nav-bar-background: #111113;
+  --rfb-button-background-hover: #2E3135;
+
+  /*bordery i do kresek jakby byly potrzebne*/
+  --rfb-border-grey: #3a3a3a;
+  --rfb-border-purple: #56468b;
+
+  /*fiolety*/
+  --rfb-strong-purple: #6e56cf;
+  --rfb-soft-purple: #291f43;
+  --rfb-soft-purple-hover: #33255b;
+
+  /*fonty*/
+  --rfb-primary-text: #eeeeee;
+  --rfb-secondary-text: #b4b4b4;
+  --rfb-purple-soft-text: #baa7ff;
+  --rfb-primary-for-purple-components-text: #ffffff;
+}
 
 html,
 body {
@@ -10,7 +33,7 @@ body {
 body {
   min-height: 100vh;
   font-family: Arial, sans-serif;
-  background-color: #c6d7e4;
+  background-color: var(--rfb-page-background);
 }
 
 * {

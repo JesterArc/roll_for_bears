@@ -100,7 +100,7 @@ export class CreateSession {
     formData.append("Tagline", values.session_tagline);
     formData.append("IsGeneratingNotes", String(values.generate_notes))
     formData.append("GameSystem", values.game_system);
-    formData.append("GameType", values.game_type);
+    formData.append("GameType", values.game_type === "Campaign" ? "Campaign" : "Oneshot");
     formData.append("MinimalPlayers", String(values.min_players));
     formData.append("MaximalPlayers", String(values.max_players));
     formData.append("GameLanguage", values.language);

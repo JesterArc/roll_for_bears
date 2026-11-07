@@ -1,10 +1,11 @@
-﻿using System.Net;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RollForBears.Modules.Sessions.Contracts.Api;
 using RollForBears.Modules.Sessions.Contracts.DTOs;
-using System.Threading;
+
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Npgsql;
 
 namespace RollForBears.Modules.Sessions.Controllers;
@@ -116,9 +117,10 @@ public sealed class SessionsController : ControllerBase
     public async Task<IActionResult> CreateSessionAsync([FromForm] SessionCreateRequestDto request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        var ownerUuid = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub));
         try
         {
-            var newSessionUuid = await _sessionsApi.CreateSessionAsync(request, cancellationToken);
+            var newSessionUuid = await _sessionsApi.CreateSessionAsync(request, ownerUuid, cancellationToken);
             return CreatedAtRoute("GetSession", new { sessionId = newSessionUuid.ToString()}, newSessionUuid);
         }
         catch (OperationCanceledException)
@@ -131,6 +133,7 @@ public sealed class SessionsController : ControllerBase
         }
         catch (Exception)
         {
+            Console.Write(ownerUuid.ToString());
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }

@@ -18,7 +18,7 @@ public class SessionsService : ISessionsApi
         _userApi = userApi;
     }
     
-    public async Task<Guid> CreateSessionAsync(SessionCreateRequestDto request, CancellationToken cancellationToken)
+    public async Task<Guid> CreateSessionAsync(SessionCreateRequestDto request, Guid ownerUuid, CancellationToken cancellationToken)
     {
         var time = DateTime.UtcNow;
         var newSession = new Session()
@@ -32,7 +32,7 @@ public class SessionsService : ISessionsApi
             MinimalPlayers = request.MinimalPlayers,
             MaximalPlayers = request.MaximalPlayers,
             GameLanguage = request.GameLanguage,
-            OwnerUuid = request.OwnerUuid,
+            OwnerUuid = ownerUuid,
             SessionDescription = request.GameDescription,
             NextSessionDate = request.NextSessionDate,
             CreatedAt = time,
@@ -42,7 +42,7 @@ public class SessionsService : ISessionsApi
         [
             new SessionPlayer()
             {
-                AccountId = newSession.OwnerUuid,
+                AccountId = ownerUuid,
                 ConnectionId = Guid.NewGuid(),
                 Role = request.PlayerRole,
                 SessionId = newSession.Uuid,

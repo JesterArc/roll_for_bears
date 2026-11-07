@@ -12,7 +12,7 @@ public sealed class SessionCreateRequestDto
     public required int MinimalPlayers { get; set; }
     public required int MaximalPlayers { get; set; }
     public required string GameLanguage { get; set; } = null!;
-    public Guid OwnerUuid { get; set; }
+    // public Guid OwnerUuid { get; set; }
     public required string GameDescription { get; set; } = null!;
     public DateTime? NextSessionDate { get; set; }
     public required PlayerRole PlayerRole { get; set; }

@@ -46,7 +46,7 @@ public static class UsersModule
         services.AddSingleton(new RefreshTokenGenerator());
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
+            .AddJwtBearer("userAuth", options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {

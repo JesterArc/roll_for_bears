@@ -45,7 +45,7 @@ public partial class UsersDbContext : DbContext
             entity.Property(e => e.StatusChangedAt)
                 .HasColumnType("timestamp with time zone")
                 .HasColumnName("status_changed_at");
-            
+
             entity.Property(e => e.Status)
                 .HasColumnName("status")
                 .HasColumnType("users.status")

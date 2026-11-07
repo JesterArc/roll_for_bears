@@ -55,7 +55,8 @@ internal sealed class UsersService : IUsersApi
             Status = AccountStatus.Pending,
             Username = request.Username
         };
-        _dbContext.Accounts.Add(account);
+        
+        await _dbContext.Accounts.AddAsync(account, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -95,17 +96,16 @@ internal sealed class UsersService : IUsersApi
 
         if (refreshToken.RevokedAt != null)
         {
-            const string querry = """
-                                  UPDATE users.refresh_token
-                                  SET revoked_at = @revokedAt
-                                  WHERE family_uuid = @familyId
-                                  AND revoked_at IS NULL;
-                                  """;
+            var listOfTokens = await _dbContext.RefreshTokens
+                .Where(rt => rt.FamilyId == refreshToken.FamilyId && rt.RevokedAt == null)
+                .ToListAsync(cancellationToken);
+
+            foreach (var token in listOfTokens)
+            {
+                token.RevokedAt = currentTime;
+            }
             
-            var revokedParam = new NpgsqlParameter("revokedAt", currentTime);
-            var familyParam = new NpgsqlParameter("familyId", refreshToken.FamilyId);
-            
-            await _dbContext.Database.ExecuteSqlRawAsync(querry, revokedParam, familyParam, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return null;
         }
@@ -114,11 +114,11 @@ internal sealed class UsersService : IUsersApi
         {
             return null;
         }
-
         currentTime = DateTime.UtcNow;
-        string newJwtToken = _jwtTokenGenerator.Generate(refreshToken.AccountId, refreshToken.Account.Username!);
-        string newRefreshToken = _refreshTokenGenerator.Generate();
-        string newRTHash = _refreshTokenGenerator.Hash(newRefreshToken);
+        
+        var newJwtToken = _jwtTokenGenerator.Generate(refreshToken.AccountId, refreshToken.Account.Username!);
+        var newRefreshToken = _refreshTokenGenerator.Generate();
+        var newRTHash = _refreshTokenGenerator.Hash(newRefreshToken);
 
         var refreshTokenRecord = new RefreshToken
         {
@@ -146,24 +146,23 @@ internal sealed class UsersService : IUsersApi
 
     public async Task LogoutAsync(string tokenRequest, CancellationToken cancellationToken)
     {
-        string tokenHash = _refreshTokenGenerator.Hash(tokenRequest);
+        var tokenHash = _refreshTokenGenerator.Hash(tokenRequest);
         
-        DateTime currentTime = DateTime.UtcNow;
+        var familyUuid = await _dbContext.RefreshTokens
+            .Where(rt => rt.TokenHash == tokenHash)
+            .Select(rt => rt.FamilyId).FirstOrDefaultAsync(cancellationToken);
+        
+        var refreshToken = await _dbContext.RefreshTokens
+            .Where(rt => rt.FamilyId == familyUuid && rt.RevokedAt == null)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        const string querry = """
-                              UPDATE users.refresh_token
-                              SET revoked_at = @revokedAt
-                              WHERE family_uuid = (
-                                  SELECT t.family_uuid FROM users.refresh_token t
-                                                    WHERE t.token_hash = @hash
-                                                    LIMIT 1)
-                              AND revoked_at IS NULL;
-                              """;
+        if (refreshToken != null)
+        {
+            refreshToken.RevokedAt = DateTime.UtcNow;
+        }
         
-        var revokedParam = new NpgsqlParameter("revokedAt", currentTime);
-        var hashParam = new NpgsqlParameter("hash", tokenHash);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         
-        await _dbContext.Database.ExecuteSqlRawAsync(querry, revokedParam, hashParam, cancellationToken);
     }
 
     public async Task<string?> GetPlayerUsernameAsync(string playerUuid, CancellationToken cancellationToken)

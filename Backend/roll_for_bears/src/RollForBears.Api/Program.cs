@@ -15,8 +15,6 @@ builder.Services
     .AddApplicationPart(typeof(UsersModule).Assembly)
     .AddApplicationPart(typeof(SessionsModule).Assembly);
 
-//TODO: after implementing the module add .AddApplicationPart(typeof(SessionsModule).Assembly) here ^;
-
 builder.Services.AddUsersModule(builder.Configuration);
 builder.Services.AddSessionsModule(builder.Configuration);
 

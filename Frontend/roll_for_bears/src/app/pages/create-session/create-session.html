@@ -80,7 +80,7 @@
         @for (game_mode of gameModes; track game_mode; let i = $index){
           <div class="game-mode-option">
 
-            <input type="radio" [id]="'game-mode-' + i" formControlName="game_mode" [value]="game_mode">
+            <input type="radio" [id]="'game-mode-' + i" formControlName="game_type" [value]="game_mode">
 
             <label [for]="'game-mode-' + i">
               {{ game_mode }}
@@ -220,6 +220,8 @@
       </div>
     </div>
 
-
+    <button type="submit">
+      Create Session
+    </button>
   </form>
 </main>

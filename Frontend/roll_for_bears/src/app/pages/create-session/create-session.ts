@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NavBar } from '../../shared/nav-bar/nav-bar';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SessionPlayerDto, SessionRole } from '../../shared/dtos/session-player.dto';
 import { Router } from '@angular/router';
+import { SessionService } from '../../Services/SessionsService';
 
 @Component({
   imports: [NavBar, ReactiveFormsModule],
@@ -11,6 +12,7 @@ import { Router } from '@angular/router';
   templateUrl: './create-session.html',
 })
 export class CreateSession {
+  private readonly _sessionService = inject(SessionService);
   gameModes = [
     'Campaign',
     'One-shot'
@@ -44,7 +46,7 @@ export class CreateSession {
       nonNullable: true
     }),
 
-    game_mode: new FormControl ('', {
+    game_type: new FormControl ('', {
       validators: [Validators.required],
       nonNullable: true
     }),
@@ -91,8 +93,39 @@ export class CreateSession {
       return;
     }
 
-    console.log(this.sessionForm.value);
-    console.log(this.players);
+    const values = this.sessionForm.getRawValue();
+    const formData = new FormData();
+
+    formData.append("Name", values.session_name);
+    formData.append("Tagline", values.session_tagline);
+    formData.append("IsGeneratingNotes", String(values.generate_notes))
+    formData.append("GameSystem", values.game_system);
+    formData.append("GameType", values.game_type);
+    formData.append("MinimalPlayers", String(values.min_players));
+    formData.append("MaximalPlayers", String(values.max_players));
+    formData.append("GameLanguage", values.language);
+    formData.append("GameDescription", String(values.description) ?? "");
+
+    if (values.session_date) {
+      formData.append("NextSessionDate", `${values.session_date} 19:00:00+1`);
+    }
+
+    var owner = this.players.find(player => player.is_owner);
+
+    if (!owner) {
+      return;
+    }
+
+    formData.append("PlayerRole", owner.role === "GM" ? "Gamemaster" : "Player");
+
+    this._sessionService.createSession(formData).subscribe({
+      next: (sessionUuid) => {
+        this.router.navigate(['/sessions-details', sessionUuid]);
+      },
+      error: (error) => {
+        console.log("nie udało sie utworzyć sesji: ", error);
+      }
+    })
   }
 
 

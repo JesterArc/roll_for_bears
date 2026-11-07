@@ -7,6 +7,7 @@ using RollForBears.Modules.Users.Models;
 using RollForBears.Modules.Users.Security;
 using RollForBears.Modules.Users.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.IdentityModel.Tokens;
 
 namespace RollForBears.Modules.Users;
@@ -46,8 +47,10 @@ public static class UsersModule
         services.AddSingleton(new RefreshTokenGenerator());
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer("userAuth", options =>
+            .AddJwtBearer(options =>
             {
+                options.MapInboundClaims = false;
+                
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuer = true,

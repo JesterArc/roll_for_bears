@@ -21,7 +21,7 @@ public interface ISessionsApi
     Task<ICollection<SessionJoinRequestInfoDto>> GetSessionJoinRequestListAsync(string sessionId, 
         CancellationToken cancellationToken);
     
-    Task<Guid> AddPlayerToSessionAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken);
+    Task<Guid> AddPlayerToSessionAsync(SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken);
     
     Task<Guid> ChangePlayerRoleAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken);
     
@@ -31,4 +31,5 @@ public interface ISessionsApi
         CancellationToken cancellationToken);
     
     Task DeleteSessionAsync(string sessionId, CancellationToken cancellationToken);
+    Task<Guid> AddJoinRequestToSessionAsync(SessionJoinRequestAddDto request, Guid userUuid, CancellationToken cancellationToken);
 }

@@ -22,12 +22,12 @@ public sealed class SessionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetSessionsAsync(CancellationToken cancellationToken, [FromQuery] int page=0, int pageSize=10)
+    public async Task<IActionResult> GetSessionsAsync(CancellationToken cancellationToken, [FromQuery] int page=1, int pageSize=10)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (page < 0)
+        if (page <= 0)
         {
-            return BadRequest("Page number cannot be less than zero");
+            return BadRequest("Page number cannot be less than or equal to zero");
         }
         if (pageSize <= 0)
         {
@@ -54,12 +54,12 @@ public sealed class SessionsController : ControllerBase
     
     [HttpGet("filtered")]
     public async Task<IActionResult> GetSessionsFilteredAsync([FromForm] SessionFilteredRequestDto dto, 
-        CancellationToken cancellationToken, [FromQuery] int page=0, int pageSize=10)
+        CancellationToken cancellationToken, [FromQuery] int page=1, int pageSize=10)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (page < 0)
+        if (page <= 0)
         {
-            return BadRequest("Page number cannot be less than zero");
+            return BadRequest("Page number cannot be less than or equal to zero");
         }
         if (pageSize <= 0)
         {
@@ -74,6 +74,72 @@ public sealed class SessionsController : ControllerBase
         catch (OperationCanceledException)
         {
             return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (NpgsqlException)
+        {
+            return BadRequest("Invalid request");
+        }
+        catch (Exception)
+        {
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+    
+    [HttpPost("request/join")]
+    public async Task<IActionResult> RequestJoinAsync([FromForm] SessionJoinRequestAddDto request,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUserUuid();
+        if (userUuid == Guid.Empty)
+        {
+            return new StatusCodeResult(StatusCodes.Status401Unauthorized);
+        }
+        try
+        {
+            var updatedSessionUuid =
+                await _sessionsApi.AddJoinRequestToSessionAsync(request, userUuid, cancellationToken);
+            return CreatedAtRoute("GetSession", new { sessionId = updatedSessionUuid.ToString() }, updatedSessionUuid);
+        }
+        catch (OperationCanceledException)
+        {
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (BadHttpRequestException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (NpgsqlException)
+        {
+            return BadRequest("Invalid request");
+        }
+        catch (Exception)
+        {
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpPost("request/accept")]
+    public async Task<IActionResult> AcceptJoinRequestAsync([FromForm] SessionPlayerAddDto request, 
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUserUuid();
+        if (userUuid == Guid.Empty)
+        {
+            return new StatusCodeResult(StatusCodes.Status401Unauthorized);
+        }
+        try
+        {
+            var updatedSessionUuid = await _sessionsApi.AddPlayerToSessionAsync(request, userUuid, cancellationToken);
+            return CreatedAtRoute("GetSession", new { sessionId = updatedSessionUuid.ToString() }, updatedSessionUuid);
+        } catch (OperationCanceledException)
+        {
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (BadHttpRequestException exception)
+        {
+            return BadRequest(exception.Message);
         }
         catch (NpgsqlException)
         {
@@ -117,7 +183,7 @@ public sealed class SessionsController : ControllerBase
     public async Task<IActionResult> CreateSessionAsync([FromForm] SessionCreateRequestDto request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var ownerUuid = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub));
+        var ownerUuid = GetUserUuid();
         try
         {
             var newSessionUuid = await _sessionsApi.CreateSessionAsync(request, ownerUuid, cancellationToken);
@@ -133,8 +199,12 @@ public sealed class SessionsController : ControllerBase
         }
         catch (Exception)
         {
-            Console.Write(ownerUuid.ToString());
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
+    }
+
+    private Guid GetUserUuid()
+    {
+        return Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? Guid.Empty.ToString());
     }
 }

@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using RollForBears.Modules.Sessions.Contracts.Api;
 using RollForBears.Modules.Sessions.Contracts.DTOs;
+using RollForBears.Modules.Sessions.Contracts.Enums;
 using RollForBears.Modules.Sessions.Database;
 using RollForBears.Modules.Sessions.Models;
 using RollForBears.Modules.Users.Contracts.Api;
@@ -92,7 +94,7 @@ public class SessionsService : ISessionsApi
     {
         var sessions = 
             await _dbContext.Sessions
-                .Skip(page * pageSize)
+                .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .OrderBy(s => s.CreatedAt)
                 .Select(s => new SessionInfoListViewDto()
@@ -124,7 +126,7 @@ public class SessionsService : ISessionsApi
             .Where(s=> request.IsGeneratingNotes == null || request.IsGeneratingNotes == s.IsGeneratingNotes)
             .Where(s => request.SessionBeforeDate == null || request.SessionBeforeDate >= s.NextSessionDate)
             .Where(s => request.SessionAfterDate == null || request.SessionAfterDate <= s.NextSessionDate)
-            .Skip(page * pageSize)
+            .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .OrderBy(s => s.CreatedAt)
             .Select(s => new SessionInfoListViewDto()
@@ -172,10 +174,60 @@ public class SessionsService : ISessionsApi
         }).ToList();
     }
 
-    public async Task<Guid> AddPlayerToSessionAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken)
+    public async Task<Guid> AddPlayerToSessionAsync(SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
+        var session = await _dbContext.Sessions.Include(s => s.JoinRequests)
+            .Include(s => s.Players)
+            .Where(s => s.Uuid == request.SessionId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (session == null)
+        {
+            throw new BadHttpRequestException("Session doesn't exist");
+        }
+
+        if (session.OwnerUuid != userUuid)
+        {
+            throw new UnauthorizedAccessException("You are not authorized to add players to this session");
+        }
+        
+        var joinRequest = session.JoinRequests.FirstOrDefault(jr => jr.AccountUuid == request.UserId);
+        
+        if (joinRequest == null)
+        {
+            throw new BadHttpRequestException("No such request found");
+        }
+        
+        if (session.Players.Select(p => p.AccountId).ToList().Contains(request.UserId))
+        {
+            throw new BadHttpRequestException("Player is already in this session");
+        }
+
+        var sessionPlayer = new SessionPlayer()
+        {
+            AccountId = request.UserId,
+            SessionId = request.SessionId,
+            Role = request.Role,
+            ConnectionId = Guid.NewGuid(),
+        };
+        
+        if (request.Role == PlayerRole.Gamemaster)
+        {
+            foreach (var player in session.Players)
+            {
+                if (player.Role == PlayerRole.Gamemaster)
+                {
+                    player.Role = PlayerRole.Player;
+                }
+            }
+        }
+        
+        await _dbContext.SessionPlayers.AddAsync(sessionPlayer, cancellationToken);
+        _dbContext.JoinRequests.Remove(joinRequest);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return request.SessionId;
+    }   
+        
 
     public async Task<Guid> ChangePlayerRoleAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken)
     {
@@ -195,5 +247,42 @@ public class SessionsService : ISessionsApi
     public async Task DeleteSessionAsync(string sessionId, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<Guid> AddJoinRequestToSessionAsync(SessionJoinRequestAddDto request, Guid userUuid, CancellationToken cancellationToken)
+    {
+        var session = await _dbContext.Sessions.Include(s => s.JoinRequests)
+            .Where(s => s.Uuid == request.SessionId)
+            .Select(s => new
+            {
+                ownerUuid = s.OwnerUuid,
+                JoinRequests = s.JoinRequests.Select(jr => jr.AccountUuid).ToList()
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+        
+        if (session == null)
+        {
+            throw new BadHttpRequestException("Session doesn't exist");
+        }
+        if (session.ownerUuid == userUuid)
+        {
+            throw new BadHttpRequestException("You are the owner of this session");
+        }
+        if (session.JoinRequests.Contains(userUuid))
+        {
+            throw new BadHttpRequestException("You already requested to join this session");
+        }
+        
+        var joinRequest = new JoinRequest()
+        {
+            AccountUuid = userUuid,
+            ConnectionUuid = Guid.NewGuid(),
+            PlayerRole = request.Role,
+            SessionUuid = request.SessionId
+        };
+        
+        await _dbContext.JoinRequests.AddAsync(joinRequest, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return joinRequest.SessionUuid;
     }
 }

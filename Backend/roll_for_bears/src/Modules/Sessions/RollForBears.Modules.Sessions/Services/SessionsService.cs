@@ -188,7 +188,7 @@ public class SessionsService : ISessionsApi
 
         if (session.OwnerUuid != userUuid)
         {
-            throw new UnauthorizedAccessException("You are not authorized to add players to this session");
+            throw new UnauthorizedAccessException("You are not authorized to modify this session");
         }
         
         var joinRequest = session.JoinRequests.FirstOrDefault(jr => jr.AccountUuid == request.UserId);
@@ -284,5 +284,35 @@ public class SessionsService : ISessionsApi
         await _dbContext.JoinRequests.AddAsync(joinRequest, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return joinRequest.SessionUuid;
+    }
+
+    public async Task<Guid> RemoveJoinRequestFromSessionAsync(SessionJoinRequestRemoveDto request, Guid userUuid,
+        CancellationToken cancellationToken)
+    {
+        var ownerUuid = await _dbContext.Sessions.Include(s => s.JoinRequests)
+            .Where(s => s.Uuid == request.SessionId)
+            .Select(s => s.OwnerUuid)
+            .FirstOrDefaultAsync(cancellationToken);
+        
+        if (ownerUuid == Guid.Empty)
+        {
+            throw new BadHttpRequestException("Session doesn't exist");
+        }
+        
+        if (ownerUuid != userUuid)
+        {
+            throw new UnauthorizedAccessException("You are not authorized to modify this session");
+        }
+        
+        var joinRequest = await _dbContext.JoinRequests.FirstOrDefaultAsync(fr => fr.AccountUuid == request.UserId, cancellationToken);
+        
+        if (joinRequest == null)
+        {
+            throw new BadHttpRequestException("No such request found");
+        }
+        
+        _dbContext.JoinRequests.Remove(joinRequest);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return request.SessionId;
     }
 }

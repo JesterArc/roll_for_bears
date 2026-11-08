@@ -150,7 +150,40 @@ public sealed class SessionsController : ControllerBase
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
-    
+
+    [HttpDelete("request/deny")]
+    public async Task<IActionResult> RemoveJoinRequestAsync([FromForm] SessionJoinRequestRemoveDto request,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUserUuid();
+        if (userUuid == Guid.Empty)
+        {
+            return new StatusCodeResult(StatusCodes.Status401Unauthorized);
+        }
+        try
+        {
+            var updatedSessionUuid = await _sessionsApi.RemoveJoinRequestFromSessionAsync(request, userUuid, cancellationToken);
+            var uri = new Uri(Url.Link("GetSession", new { sessionId = updatedSessionUuid.ToString() }) ?? string.Empty);
+            Response.Headers.Append("Location", uri.AbsoluteUri);
+            return Ok();
+        } catch (OperationCanceledException)
+        {
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (BadHttpRequestException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (NpgsqlException)
+        {
+            return BadRequest("Invalid request");
+        }
+        catch (Exception)
+        {
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
 
     [HttpGet("{sessionId}", Name="GetSession")]
     public async Task<IActionResult> GetSpecificSessionAsync([FromRoute] string sessionId, CancellationToken cancellationToken)

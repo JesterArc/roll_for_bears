@@ -32,4 +32,5 @@ public interface ISessionsApi
     
     Task DeleteSessionAsync(string sessionId, CancellationToken cancellationToken);
     Task<Guid> AddJoinRequestToSessionAsync(SessionJoinRequestAddDto request, Guid userUuid, CancellationToken cancellationToken);
+    Task<Guid> RemoveJoinRequestFromSessionAsync(SessionJoinRequestRemoveDto request, Guid userUuid, CancellationToken cancellationToken);
 }

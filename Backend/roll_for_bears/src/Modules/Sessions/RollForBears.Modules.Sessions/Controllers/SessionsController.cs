@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ public sealed class SessionsController : ControllerBase
         _sessionsApi = sessionsApi;
     }
 
-    [HttpGet]
+    [HttpGet(Name="GetSessions")]
     public async Task<IActionResult> GetSessionsAsync(CancellationToken cancellationToken, [FromQuery] int page=1, int pageSize=10)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -93,7 +94,7 @@ public sealed class SessionsController : ControllerBase
         var userUuid = GetUserUuid();
         if (userUuid == Guid.Empty)
         {
-            return new StatusCodeResult(StatusCodes.Status401Unauthorized);
+            return Unauthorized("You are not logged in");
         }
         try
         {
@@ -119,6 +120,86 @@ public sealed class SessionsController : ControllerBase
         }
     }
 
+    [HttpPut("request/change_role")]
+    public async Task<IActionResult> ChangePlayerRoleAsync([FromForm] SessionPlayerAddDto request,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUserUuid();
+        if (userUuid == Guid.Empty)
+        {
+            return Unauthorized("You are not logged in");
+        }
+
+        try
+        {
+            var updatedSessionUuid = await _sessionsApi.ChangePlayerRoleAsync(request, userUuid, cancellationToken);
+            var uri = new Uri(Url.Link("GetSession", new { sessionId = updatedSessionUuid.ToString() }) ??
+                              string.Empty);
+            Response.Headers.Append("Location", uri.AbsoluteUri);
+            return Ok();
+        }
+        catch (OperationCanceledException)
+        {
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (AuthenticationException exception)
+        {
+            return Unauthorized(exception.Message);
+        }
+        catch (BadHttpRequestException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (NpgsqlException)
+        {
+            return BadRequest("Invalid request");
+        }
+        catch (Exception)
+        {
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpPut("request/update")]
+    public async Task<IActionResult> UpdateSessionAsync([FromForm] SessionUpdateRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUserUuid();
+        if (userUuid == Guid.Empty)
+        {
+            return Unauthorized("You are not logged in");
+        }
+        try
+        {
+            var updatedSessionUuid = await _sessionsApi.UpdateSessionInfoAsync(request, userUuid, cancellationToken);
+            var uri = new Uri(Url.Link("GetSession", new { sessionId = updatedSessionUuid.ToString() }) ?? string.Empty);
+            Response.Headers.Append("Location", uri.AbsoluteUri);
+            return Ok();
+        } catch (OperationCanceledException)
+        {
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (AuthenticationException exception)
+        {
+            return Unauthorized(exception.Message);
+        }
+        catch (BadHttpRequestException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (NpgsqlException)
+        {
+            return BadRequest("Invalid request");
+        }
+        catch (Exception)
+        {
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+    
+
     [HttpPost("request/accept")]
     public async Task<IActionResult> AcceptJoinRequestAsync([FromForm] SessionPlayerAddDto request, 
         CancellationToken cancellationToken)
@@ -127,7 +208,7 @@ public sealed class SessionsController : ControllerBase
         var userUuid = GetUserUuid();
         if (userUuid == Guid.Empty)
         {
-            return new StatusCodeResult(StatusCodes.Status401Unauthorized);
+            return Unauthorized("You are not logged in");
         }
         try
         {
@@ -136,6 +217,10 @@ public sealed class SessionsController : ControllerBase
         } catch (OperationCanceledException)
         {
             return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (AuthenticationException exception)
+        {
+            return Unauthorized(exception.Message);
         }
         catch (BadHttpRequestException exception)
         {
@@ -159,7 +244,7 @@ public sealed class SessionsController : ControllerBase
         var userUuid = GetUserUuid();
         if (userUuid == Guid.Empty)
         {
-            return new StatusCodeResult(StatusCodes.Status401Unauthorized);
+            return Unauthorized("You are not logged in");
         }
         try
         {
@@ -170,6 +255,10 @@ public sealed class SessionsController : ControllerBase
         } catch (OperationCanceledException)
         {
             return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (AuthenticationException exception)
+        {
+            return Unauthorized(exception.Message);
         }
         catch (BadHttpRequestException exception)
         {
@@ -183,6 +272,87 @@ public sealed class SessionsController : ControllerBase
         {
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
+    }
+
+    [HttpDelete("request/remove")]
+    public async Task<IActionResult> RemovePlayerAsync([FromForm] SessionPlayerRemoveDto request,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUserUuid();
+        if (userUuid == Guid.Empty)
+        {
+            return Unauthorized("You are not logged in");
+        }
+        try
+        {
+            var updatedSessionUuid = await _sessionsApi.RemovePlayerAsync(request, userUuid, cancellationToken);
+            var uri = new Uri(Url.Link("GetSession", new { sessionId = request.SessionId.ToString() }) ?? string.Empty);
+            Response.Headers.Append("Location", uri.AbsoluteUri);
+            if (updatedSessionUuid == Guid.Empty)
+            {
+                return NoContent();
+            }
+            return Ok();
+        } catch (OperationCanceledException)
+        {
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (AuthenticationException exception)
+        {
+            return Unauthorized(exception.Message);
+        }
+        catch (BadHttpRequestException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (NpgsqlException)
+        {
+            return BadRequest("Invalid request");
+        }
+        catch (Exception)
+        {
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpDelete("request/delete/{sessionId}")]
+    public async Task<IActionResult> DeleteSessionAsync([FromRoute] string sessionId,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUserUuid();
+        if (userUuid == Guid.Empty)
+        {
+            return Unauthorized("You are not logged in");
+        }
+        try
+        {
+            await _sessionsApi.DeleteSessionAsync(sessionId, userUuid, cancellationToken);
+            var uri = new Uri(Url.Link("GetSessions", new { }) ?? string.Empty);
+            Response.Headers.Append("Location", uri.AbsoluteUri);
+            return NoContent();
+        } catch (OperationCanceledException)
+        {
+            return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
+        }
+        catch (AuthenticationException exception)
+        {
+            return Unauthorized(exception.Message);
+        }
+        catch (BadHttpRequestException exception)
+        {
+            return BadRequest(exception.Message);
+        }
+        catch (NpgsqlException)
+        {
+            return BadRequest("Invalid request");
+        }
+        catch (Exception)
+        {
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
+        
     }
 
     [HttpGet("{sessionId}", Name="GetSession")]

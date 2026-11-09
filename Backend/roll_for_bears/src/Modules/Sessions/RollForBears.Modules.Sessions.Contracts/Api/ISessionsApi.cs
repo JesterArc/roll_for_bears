@@ -23,14 +23,14 @@ public interface ISessionsApi
     
     Task<Guid> AddPlayerToSessionAsync(SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken);
     
-    Task<Guid> ChangePlayerRoleAsync(SessionPlayerAddDto dto, CancellationToken cancellationToken);
+    Task<Guid> ChangePlayerRoleAsync(SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken);
     
-    Task<Guid> RemovePlayerAsync(SessionPlayerRemoveDto dto, CancellationToken cancellationToken);
+    Task<Guid> RemovePlayerAsync(SessionPlayerRemoveDto request, Guid userUuid, CancellationToken cancellationToken);
     
-    Task<SessionInfoSpecificDto?> UpdateSessionInfoAsync(SessionUpdateRequestDto request, 
+    Task<Guid> UpdateSessionInfoAsync(SessionUpdateRequestDto request, Guid userUuid, 
         CancellationToken cancellationToken);
     
-    Task DeleteSessionAsync(string sessionId, CancellationToken cancellationToken);
+    Task DeleteSessionAsync(string sessionId, Guid userUuid, CancellationToken cancellationToken);
     Task<Guid> AddJoinRequestToSessionAsync(SessionJoinRequestAddDto request, Guid userUuid, CancellationToken cancellationToken);
     Task<Guid> RemoveJoinRequestFromSessionAsync(SessionJoinRequestRemoveDto request, Guid userUuid, CancellationToken cancellationToken);
 }

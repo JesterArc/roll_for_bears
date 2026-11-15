@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RollForBears.Modules.Sessio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RollForBears.Modules.Sessions.Tests", "src\Modules\Sessions\RollForBears.Modules.Sessions.Tests\RollForBears.Modules.Sessions.Tests.csproj", "{A7A360E8-92A8-4145-9DD4-66B94599A19E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RollForBears.Modules.Shared_Kernel", "src\Modules\Shared_Kernel\RollForBears.Modules.Shared_Kernel\RollForBears.Modules.Shared_Kernel.csproj", "{015B0ACB-0DEF-45D9-92EB-7EAC3AE0DC1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{A7A360E8-92A8-4145-9DD4-66B94599A19E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7A360E8-92A8-4145-9DD4-66B94599A19E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7A360E8-92A8-4145-9DD4-66B94599A19E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{015B0ACB-0DEF-45D9-92EB-7EAC3AE0DC1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{015B0ACB-0DEF-45D9-92EB-7EAC3AE0DC1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{015B0ACB-0DEF-45D9-92EB-7EAC3AE0DC1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{015B0ACB-0DEF-45D9-92EB-7EAC3AE0DC1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

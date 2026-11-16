@@ -1,0 +1,7 @@
+{
+  "descriptioin": "w tym json znajda się wszystkie ustawienia potrzebne dla systemu przyklad znajduje się poniżej"
+  "grid": {
+    "distanceUnit": "ft",
+    "distancePerSquare": 5
+  }
+}

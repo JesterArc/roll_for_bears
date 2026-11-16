@@ -1,0 +1,14 @@
+Actions that could to be implemented:
+
+- Attack
+- Dash
+- Disengage
+- Dodge
+- Help
+- Hide
+- Influence
+- Magic
+- Ready
+- Search
+- Study
+- Utilize

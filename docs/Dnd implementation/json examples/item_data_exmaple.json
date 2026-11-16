@@ -1,0 +1,8 @@
+{
+  "description": "przykład dla miecza z item_type= 'weapon'"
+  "damage": {
+    "diceCount": 1,
+    "diceSides": 8,
+    "type": "slashing"
+  }
+}

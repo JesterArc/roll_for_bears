@@ -1,0 +1,10 @@
+{
+  "description": "przykład sheet dla sheet_type="character" i base_key="default" " 
+  "fields": {
+    "level":     { "type": "integer", "required": true, "default": 1 },
+    "strength":  { "type": "integer", "required": true },
+    "armorClass": { "type": "integer", "required": true },
+    "maxHp":     { "type": "integer", "required": true },
+    "currentHp": { "type": "integer", "required": true }
+  }
+}

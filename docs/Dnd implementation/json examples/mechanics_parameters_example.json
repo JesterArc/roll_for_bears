@@ -1,0 +1,10 @@
+{
+  "description": "przykład jak moga wyglądać parametry dla klucza "fireball" i handlara "save_then_damage"
+  "saveAbility": "dexterity",
+  "damage": {
+    "diceCount": 8,
+    "diceSides": 6,
+    "type": "fire"
+  },
+  "damageMultiplier": 0.5
+}

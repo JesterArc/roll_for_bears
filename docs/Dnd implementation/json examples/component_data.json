@@ -1,0 +1,7 @@
+{
+  "description": "przykład component_data dla typu 'skill' i klucza 'fireball'"
+  "spellLevel": 3,
+  "school": "evocation",
+  "castingTime": "action",
+  "duration": "instantaneous"
+}

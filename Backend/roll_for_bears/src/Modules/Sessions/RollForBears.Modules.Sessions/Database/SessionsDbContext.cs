@@ -39,8 +39,7 @@ public partial class SessionsDbContext : DbContext
             entity.Property(e => e.Tagline)
                 .HasMaxLength(50)
                 .IsRequired(false)
-                .HasColumnName("tagline")
-                .IsRequired();
+                .HasColumnName("tagline");
             
             entity.Property(e => e.IsGeneratingNotes)
                 .HasColumnName("generating_notes")

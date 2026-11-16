@@ -1,9 +1,9 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using roll_for_bears.Database;
+using RollForBears.Api;
 using RollForBears.Api.MainModules.LoginModule.Services;
 using RollForBears.Modules.Sessions;
-using RollForBears.Modules.Sessions.Contracts.Enums;
 using RollForBears.Modules.Users;
 
 Env.Load();
@@ -40,6 +40,8 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors("Angular");
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseAuthorization();
 

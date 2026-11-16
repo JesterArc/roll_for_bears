@@ -4,7 +4,6 @@ namespace RollForBears.Modules.Sessions.Contracts.DTOs;
 
 public sealed class SessionPlayerAddDto
 {
-    public Guid SessionId { get; set; }
     public Guid AccountId { get; set; }
     public PlayerRole Role { get; set; }
 }

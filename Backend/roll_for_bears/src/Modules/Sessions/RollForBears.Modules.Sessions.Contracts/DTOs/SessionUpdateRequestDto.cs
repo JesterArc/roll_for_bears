@@ -4,7 +4,6 @@ namespace RollForBears.Modules.Sessions.Contracts.DTOs;
 
 public sealed class SessionUpdateRequestDto
 {
-    public Guid Uuid { get; set; }
     public required string Name { get; set; } = null!;
     public string? Tagline {get; set; }
     public bool IsGeneratingNotes {get; set; } 

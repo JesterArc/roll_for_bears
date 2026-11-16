@@ -27,8 +27,6 @@ public static class SessionsModule
             ));
 
         services.AddScoped<ISessionsApi, SessionsService>();
-        
-        //TODO: Authentication and Authorization
 
         try
         {

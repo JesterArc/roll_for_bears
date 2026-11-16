@@ -6,7 +6,7 @@ public interface ISessionsApi
 {
     Task<Guid> CreateSessionAsync(SessionCreateRequestDto request, Guid ownerUuid, CancellationToken cancellationToken);
     
-    Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(string sessionId, 
+    Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(Guid sessionUuid, 
         CancellationToken cancellationToken);
     
     Task<ICollection<SessionInfoListViewDto>> GetSessionsAsync(int page, int pageSize, 
@@ -15,22 +15,22 @@ public interface ISessionsApi
     Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, 
         SessionFilteredRequestDto request, CancellationToken cancellationToken);
     
-    Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(string sessionId, 
+    Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(Guid sessionUuid, 
         CancellationToken cancellationToken);
     
-    Task<ICollection<SessionJoinRequestInfoDto>> GetSessionJoinRequestListAsync(string sessionId, 
+    Task<ICollection<SessionJoinRequestInfoDto>> GetSessionJoinRequestListAsync(Guid sessionUuid, 
         CancellationToken cancellationToken);
     
-    Task<Guid> AddPlayerToSessionAsync(SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken);
+    Task<Guid> AddPlayerToSessionAsync(Guid sessionUuid, SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken);
     
-    Task<Guid> ChangePlayerRoleAsync(SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken);
+    Task<Guid> ChangePlayerRoleAsync(Guid sessionUuid, SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken);
     
     Task<Guid> RemovePlayerAsync(SessionPlayerRemoveDto request, Guid userUuid, CancellationToken cancellationToken);
     
-    Task<Guid> UpdateSessionInfoAsync(SessionUpdateRequestDto request, Guid userUuid, 
+    Task<Guid> UpdateSessionInfoAsync(Guid sessionUuid, SessionUpdateRequestDto request, Guid userUuid, 
         CancellationToken cancellationToken);
     
-    Task DeleteSessionAsync(string sessionId, Guid userUuid, CancellationToken cancellationToken);
-    Task<Guid> AddJoinRequestToSessionAsync(SessionJoinRequestAddDto request, Guid userUuid, CancellationToken cancellationToken);
+    Task DeleteSessionAsync(Guid sessionUuid, Guid userUuid, CancellationToken cancellationToken);
+    Task<Guid> AddJoinRequestToSessionAsync(Guid sessionUuid, SessionJoinRequestAddDto request, Guid userUuid, CancellationToken cancellationToken);
     Task<Guid> RemoveJoinRequestFromSessionAsync(SessionJoinRequestRemoveDto request, Guid userUuid, CancellationToken cancellationToken);
 }

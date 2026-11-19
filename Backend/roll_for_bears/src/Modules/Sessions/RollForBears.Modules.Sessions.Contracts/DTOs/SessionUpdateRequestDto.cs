@@ -1,17 +1,30 @@
-﻿using RollForBears.Modules.Sessions.Contracts.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using RollForBears.Modules.Sessions.Contracts.Enums;
+using RollForBears.Modules.Shared_Kernel.JsonConverters;
 
 namespace RollForBears.Modules.Sessions.Contracts.DTOs;
 
 public sealed class SessionUpdateRequestDto
 {
-    public required string Name { get; set; } = null!;
+    [Required]
+    public string Name { get; set; } = null!;
     public string? Tagline {get; set; }
+    [Required]
     public bool IsGeneratingNotes {get; set; } 
-    public required string GameSystem { get; set; } = null!;
-    public required GameType GameType { get; set; }
-    public required int MinimalPlayers { get; set; }
-    public required int MaximalPlayers { get; set; }
-    public required string GameLanguage { get; set; } = null!;
-    public required string GameDescription { get; set; } = null!;
+    [Required]
+    public string GameSystem { get; set; } = null!;
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Required]
+    public GameType GameType { get; set; }
+    [Required]
+    public int MinimalPlayers { get; set; }
+    [Required]
+    public int MaximalPlayers { get; set; }
+    [Required]
+    public string GameLanguage { get; set; } = null!;
+    [Required]
+    public string GameDescription { get; set; } = null!;
+    [JsonConverter(typeof(CustomJsonDateTimeConverter))]
     public DateTime? NextSessionDate { get; set; }
 }

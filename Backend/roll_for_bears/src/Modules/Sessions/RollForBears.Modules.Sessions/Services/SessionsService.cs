@@ -1,6 +1,4 @@
-﻿using System.Security.Authentication;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RollForBears.Modules.Sessions.Contracts.Api;
 using RollForBears.Modules.Sessions.Contracts.DTOs;
 using RollForBears.Modules.Sessions.Contracts.Enums;
@@ -176,7 +174,7 @@ public class SessionsService : ISessionsApi
         }).ToList();
     }
 
-    public async Task<Guid> AddPlayerToSessionAsync(Guid sessionUuid, SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken)
+    public async Task<Guid> AddPlayerToSessionAsync(Guid sessionUuid, SessionPlayerDto request, Guid userUuid, CancellationToken cancellationToken)
     {
         var session = await _dbContext.Sessions.Include(s => s.JoinRequests)
             .Include(s => s.Players)
@@ -192,21 +190,21 @@ public class SessionsService : ISessionsApi
             throw new AccessForbiddenException("You are not authorized to modify this session");
         }
         
-        var joinRequest = session.JoinRequests.FirstOrDefault(jr => jr.AccountUuid == request.AccountId);
+        var joinRequest = session.JoinRequests.FirstOrDefault(jr => jr.AccountUuid == request.AccountUuid);
         
         if (joinRequest == null)
         {
             throw new NotFoundException("Request not found");
         }
         
-        if (session.Players.Select(p => p.AccountId).ToList().Contains(request.AccountId))
+        if (session.Players.Select(p => p.AccountId).ToList().Contains(request.AccountUuid))
         {
             throw new BadRequestException("Player is already in this session");
         }
 
         var sessionPlayer = new SessionPlayer
         {
-            AccountId = request.AccountId,
+            AccountId = request.AccountUuid,
             SessionId = sessionUuid,
             Role = request.Role,
             ConnectionId = Guid.NewGuid(),
@@ -229,7 +227,7 @@ public class SessionsService : ISessionsApi
         return sessionUuid;
     }
 
-    public async Task<Guid> ChangePlayerRoleAsync(Guid sessionUuid, SessionPlayerAddDto request, Guid userUuid, CancellationToken cancellationToken)
+    public async Task<Guid> ChangePlayerRoleAsync(Guid sessionUuid, SessionPlayerDto request, Guid userUuid, CancellationToken cancellationToken)
     {
         var session = await _dbContext.Sessions.Include(s => s.JoinRequests)
             .Include(s => s.Players)
@@ -246,7 +244,7 @@ public class SessionsService : ISessionsApi
             throw new AccessForbiddenException("You are not authorized to modify this session");
         }
 
-        var player = session.Players.FirstOrDefault(p => p.AccountId == request.AccountId);
+        var player = session.Players.FirstOrDefault(p => p.AccountId == request.AccountUuid);
 
         if (player == null)
         {
@@ -257,7 +255,7 @@ public class SessionsService : ISessionsApi
         {
             foreach (var p in session.Players)
             {
-                p.Role = player.AccountId == request.AccountId ? PlayerRole.Gamemaster : PlayerRole.Player;
+                p.Role = player.AccountId == request.AccountUuid ? PlayerRole.Gamemaster : PlayerRole.Player;
             }
         } else
         {
@@ -358,11 +356,11 @@ public class SessionsService : ISessionsApi
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Guid> AddJoinRequestToSessionAsync(Guid sessionUuid, SessionJoinRequestAddDto request, Guid userUuid, CancellationToken cancellationToken)
+    public async Task<Guid> AddJoinRequestToSessionAsync(Guid sessionUuid, SessionJoinRequestRoleDto request, Guid userUuid, CancellationToken cancellationToken)
     {
         var session = await _dbContext.Sessions.Include(s => s.JoinRequests)
             .Include(s => s.Players)
-            .Where(s => s.Uuid == request.SessionId)
+            .Where(s => s.Uuid == sessionUuid)
             .Select(s => new
             {
                 ownerUuid = s.OwnerUuid,
@@ -391,7 +389,7 @@ public class SessionsService : ISessionsApi
             AccountUuid = userUuid,
             ConnectionUuid = Guid.NewGuid(),
             PlayerRole = request.Role,
-            SessionUuid = request.SessionId
+            SessionUuid = sessionUuid
         };
         
         await _dbContext.JoinRequests.AddAsync(joinRequest, cancellationToken);

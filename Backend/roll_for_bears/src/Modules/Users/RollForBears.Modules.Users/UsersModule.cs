@@ -9,6 +9,7 @@ using RollForBears.Modules.Users.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.IdentityModel.Tokens;
+using RollForBears.Modules.Users.Contracts.Enums;
 
 namespace RollForBears.Modules.Users;
 

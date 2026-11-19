@@ -1,4 +1,4 @@
-﻿
+﻿using RollForBears.Modules.Users.Contracts.Enums;
 
 namespace RollForBears.Modules.Users.Models;
 

@@ -1,15 +1,30 @@
-﻿namespace RollForBears.Modules.Sessions.Contracts.DTOs;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using RollForBears.Modules.Shared_Kernel.JsonConverters;
 
-public sealed class SessionInfoListViewDto
+namespace RollForBears.Modules.Sessions.Contracts.DTOs;
+
+public sealed record SessionInfoListViewDto
 {
+    [Required]
+    [JsonConverter(typeof(CustomJsonGuidConverter))]
     public Guid Uuid { get; set; }
-    public required string Name { get; set; } = null!;
+    [Required]
+    public string Name { get; set; } = null!;
     public string? Tagline {get; set; }
-    public required string GameSystem { get; set; } = null!;
-    public required string GameType { get; set; }
-    public required int NumberOfPlayers { get; set; }
-    public required int MaximalPlayers { get; set; }
-    public required string GameLanguage { get; set; } = null!;
+    [Required] 
+    public string GameSystem { get; set; } = null!;
+    [Required] 
+    public string GameType { get; set; } = null!;
+    [Required] 
+    public int NumberOfPlayers { get; set; }
+    [Required] 
+    public int MaximalPlayers { get; set; }
+    [Required] 
+    public string GameLanguage { get; set; } = null!;
+    [JsonConverter(typeof(CustomJsonDateTimeConverter))]
     public DateTime? NextSessionDate { get; set; }
+    [Required]
+    [JsonConverter(typeof(CustomJsonDateTimeConverter))]
     public DateTime LastUpdatedAt { get; set; }
 }

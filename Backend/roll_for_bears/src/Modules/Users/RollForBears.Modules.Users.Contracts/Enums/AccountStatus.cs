@@ -1,4 +1,4 @@
-namespace RollForBears.Modules.Users.Models;
+namespace RollForBears.Modules.Users.Contracts.Enums;
 
 public enum AccountStatus
 {

@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Shared_Kernel\RollForBears.Modules.Shared_Kernel\RollForBears.Modules.Shared_Kernel.csproj" />
+    </ItemGroup>
+
 </Project>

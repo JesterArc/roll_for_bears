@@ -1,8 +1,7 @@
-
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using RollForBears.Modules.Users.Contracts.Api;
 using RollForBears.Modules.Users.Contracts.DTOs;
+using RollForBears.Modules.Users.Contracts.Enums;
 using RollForBears.Modules.Users.Database;
 using RollForBears.Modules.Users.Models;
 using RollForBears.Modules.Users.Security;

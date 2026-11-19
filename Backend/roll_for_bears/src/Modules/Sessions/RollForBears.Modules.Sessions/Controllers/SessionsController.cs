@@ -1,13 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using RollForBears.Modules.Sessions.Contracts.Api;
 using RollForBears.Modules.Sessions.Contracts.DTOs;
 
 using Microsoft.AspNetCore.Http;
-using Npgsql;
-using RollForBears.Modules.Shared_Kernel.Exceptions;
 using UnauthorizedAccessException = RollForBears.Modules.Shared_Kernel.Exceptions.UnauthorizedAccessException;
 
 namespace RollForBears.Modules.Sessions.Controllers;
@@ -49,7 +46,7 @@ public sealed class SessionsController : ControllerBase
     }
     
     [HttpPost("filtered")]
-    public async Task<IActionResult> GetSessionsFilteredAsync([FromForm] SessionFilteredRequestDto filters, 
+    public async Task<IActionResult> GetSessionsFilteredAsync([FromBody] SessionFilteredRequestDto filters, 
         CancellationToken cancellationToken, [FromQuery] int page=1, [FromQuery] int pageSize=10)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -67,7 +64,7 @@ public sealed class SessionsController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> CreateSessionAsync([FromForm] SessionCreateRequestDto request, 
+    public async Task<IActionResult> CreateSessionAsync([FromBody] SessionCreateRequestDto request, 
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -77,8 +74,8 @@ public sealed class SessionsController : ControllerBase
     }
     
     [HttpPost("{sessionId}/join")]
-    public async Task<IActionResult> RequestJoinAsync([FromRoute] string sessionId, [FromForm] SessionJoinRequestAddDto request,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> RequestJoinAsync([FromRoute] string sessionId, 
+        [FromBody] SessionJoinRequestRoleDto request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var userUuid = GetUuidIfLoggedIn();
@@ -89,7 +86,7 @@ public sealed class SessionsController : ControllerBase
     }
     
     [HttpPost("{sessionId}/accept")]
-    public async Task<IActionResult> AcceptJoinRequestAsync([FromRoute] string sessionId, [FromForm] SessionPlayerAddDto request, 
+    public async Task<IActionResult> AcceptJoinRequestAsync([FromRoute] string sessionId, [FromBody] SessionPlayerDto request, 
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -100,7 +97,7 @@ public sealed class SessionsController : ControllerBase
     }
     
     [HttpPut("{sessionId}/role")]
-    public async Task<IActionResult> ChangePlayerRoleAsync([FromRoute] string sessionId, [FromForm] SessionPlayerAddDto request,
+    public async Task<IActionResult> ChangePlayerRoleAsync([FromRoute] string sessionId, [FromBody] SessionPlayerDto request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -113,7 +110,7 @@ public sealed class SessionsController : ControllerBase
     }
 
     [HttpPut("{sessionId}/info")]
-    public async Task<IActionResult> UpdateSessionAsync([FromRoute] string sessionId, [FromForm] SessionUpdateRequestDto request,
+    public async Task<IActionResult> UpdateSessionAsync([FromRoute] string sessionId, [FromBody] SessionUpdateRequestDto request,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

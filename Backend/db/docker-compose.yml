@@ -1,8 +1,9 @@
+#nazwa projektu w dockerze
+name: roll_for_bears
+
 services:
-  # po prostu nazwa moze byc co kolwiek 
+  # po prostu nazwa moze byc co kolwiek
   postgres:
-    #nazwa projektu w dockerze
-    name: roll_for_bears
     # wersja postgresa na jakiej robimy
     image: postgres:18.4
     # nazwa kontenera

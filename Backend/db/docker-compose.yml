@@ -1,0 +1,32 @@
+services:
+  # po prostu nazwa moze byc co kolwiek 
+  postgres:
+    # wersja postgresa na jakiej robimy
+    image: postgres:18.4
+    # nazwa kontenera
+    container_name: roll_for_bears_db
+    # odpala baze przy otwarciu dockera jezeli nie zostal ostantio zatrzymany jak chcesz mozemy usunac albo dac no to bedzie manualne zarzadzanie
+    restart: unless-stopped
+    # eviorment - zmienne środowiskowe dla postgresa w pliku .env se ustaw te wartosci jakie chcesz
+    environment:
+      # nazwa bazy jaka tworzy
+      POSTGRES_DB: ${POSTGRES_DB}
+      # nazwa superusera
+      POSTGRES_USER: ${POSTGRES_USER}
+      # haslo superusera
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    
+    # zmapowalem na 5433 zeby ci z lokalnym postgresem nie kolidowalo
+    ports:
+      - "127.0.0.1:5433:5432"
+    
+    # sekcja mowi co podpiac gdzie
+    volumes:
+      # podpina wolumen postgres_data do katalogu /var/lib/postgresql w kontenerze
+      - postgres_data:/var/lib/postgresql
+      # sciaga zawartosc backupu 001_init_sql z ./001_init.sql wkleja do kontenera pod /docker-entrypoint-initdb.d/001_init.sql i ro jest tylko do odczytu
+      - ./001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      
+volumes:
+  # deklaruje lokalny wolumen postgres_data, każdy ma własny na swoim komputerze, przy compose up sie stworzy jak go jeszcze nie ma
+  postgres_data:

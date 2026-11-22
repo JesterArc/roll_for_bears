@@ -152,11 +152,11 @@ public class SessionsService : ISessionsApi
             .ToListAsync(cancellationToken);
         var usernames = await _userApi.GetSessionPlayersUsernamesAsync(
             players.Where(sp => sp.SessionId == sessionUuid)
-                             .Select(p => p.AccountId.ToString()).ToList(), cancellationToken);
+                             .Select(p => p.AccountId).ToList(), cancellationToken);
         return players.Select(sp => new SessionPlayerInfoDto
         {
-            Username = usernames[sp.AccountId.ToString()],
-            Role = sp.Role.ToString()
+            Username = usernames[sp.AccountId],
+            Role = sp.Role
         }).ToList();
     }
     
@@ -166,10 +166,10 @@ public class SessionsService : ISessionsApi
             .ToListAsync(cancellationToken);
         var usernames = await _userApi.GetSessionPlayersUsernamesAsync(
             players.Where(sp => sp.SessionUuid == sessionUuid)
-                .Select(p => p.AccountUuid.ToString()).ToList(), cancellationToken);
+                .Select(p => p.AccountUuid).ToList(), cancellationToken);
         return players.Select(sp => new SessionJoinRequestInfoDto()
         {
-            Username = usernames[sp.AccountUuid.ToString()],
+            Username = usernames[sp.AccountUuid],
             Role = sp.PlayerRole.ToString()
         }).ToList();
     }

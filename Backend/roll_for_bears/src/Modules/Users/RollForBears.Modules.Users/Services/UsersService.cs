@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RollForBears.Modules.Shared_Kernel.Exceptions;
 using RollForBears.Modules.Users.Contracts.Api;
 using RollForBears.Modules.Users.Contracts.DTOs;
 using RollForBears.Modules.Users.Contracts.Enums;
@@ -28,21 +29,21 @@ internal sealed class UsersService : IUsersApi
 
     public async Task RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
     {
-        bool emailExists = await _dbContext.Accounts.AnyAsync(a => a.Email == request.Email, cancellationToken);
+        var emailExists = await _dbContext.Accounts.AnyAsync(a => a.Email == request.Email, cancellationToken);
 
         if (emailExists)
         {
             throw new InvalidOperationException("Email already exists");
         }
         
-        bool usernameExist = await _dbContext.Accounts.AnyAsync(a => a.Username == request.Username, cancellationToken);
+        var usernameExist = await _dbContext.Accounts.AnyAsync(a => a.Username == request.Username, cancellationToken);
 
         if (usernameExist)
         {
             throw new InvalidOperationException("Username already exists");
         }
 
-        string hash = _passwordHasher.Hash(request.Password);
+        var hash = _passwordHasher.Hash(request.Password);
 
         var account = new Account
         {
@@ -67,14 +68,14 @@ internal sealed class UsersService : IUsersApi
         if (account == null)
             return null;
 
-        bool passwordCorrect = _passwordHasher.Verify(request.Password, account.HashWord);
+        var passwordCorrect = _passwordHasher.Verify(request.Password, account.HashWord);
         
         if (!passwordCorrect)
             return null;
         
-        string jwtToken = _jwtTokenGenerator.Generate(account.Uuid, account.Username!);
+        var jwtToken = _jwtTokenGenerator.Generate(account.Uuid, account.Username!);
 
-        string refreshToken = _refreshTokenGenerator.Generate();
+        var refreshToken = _refreshTokenGenerator.Generate();
         
         await AddRefreshTokenToDb(refreshToken, account.Uuid, cancellationToken);
         
@@ -83,11 +84,12 @@ internal sealed class UsersService : IUsersApi
 
     public async Task<LoginResultDto?> RefreshTokenAsync(string tokenRequest, CancellationToken cancellationToken)
     {
-        string hash = _refreshTokenGenerator.Hash(tokenRequest);
+        var hash = _refreshTokenGenerator.Hash(tokenRequest);
         
         var refreshToken = await _dbContext.RefreshTokens.Include(rt => rt.Account)
             .SingleOrDefaultAsync(rt => rt.TokenHash == hash, cancellationToken);
-        DateTime currentTime = DateTime.UtcNow;
+        
+        var currentTime = DateTime.UtcNow;
         if (refreshToken == null)
         {
             return null;
@@ -170,26 +172,147 @@ internal sealed class UsersService : IUsersApi
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Dictionary<string, string>> GetSessionPlayersUsernamesAsync(List<string> playerUuids, CancellationToken cancellationToken)
+    public async Task SendFriendInviteAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken)
     {
-        var accounts = await _dbContext.Accounts.Where(a => playerUuids.Contains(a.Uuid.ToString()))
-            .ToListAsync(cancellationToken);
-        return accounts.ToDictionary(a => a.Uuid.ToString(), a => a.Username ?? "");
+        await CheckIfUserAndFriendValid(userUuid, friendUuid, cancellationToken);
+
+        var alreadyFriends = await _dbContext.Friends.AsNoTracking()
+            .AnyAsync(fr => (fr.FriendUuid == friendUuid && fr.UserUuid == userUuid) ||
+                            (fr.FriendUuid == userUuid && fr.UserUuid == friendUuid), cancellationToken);
+
+        if (alreadyFriends)
+        {
+            throw new BadRequestException("Users are already friends or a friend request was already sent");
+        }
+
+        await _dbContext.Friends.AddAsync(
+            new Friend
+            {
+                FriendshipUuid = Guid.NewGuid(),
+                UserUuid = userUuid,
+                FriendUuid = friendUuid,
+                FriendshipMutual = false
+            }, cancellationToken);
+        
+        Console.Write($"user: {userUuid}, friendship: {friendUuid}");
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<Dictionary<string, string>> GetJoinRequestsUsernamesAsync(List<string> requestUuids, CancellationToken cancellationToken)
+    public async Task AcceptFriendRequestAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken)
     {
-        var accounts = await _dbContext.Accounts.Where(a => requestUuids.Contains(a.Uuid.ToString()))
+        await CheckIfUserAndFriendValid(userUuid, friendUuid, cancellationToken);
+
+        var friendRequest = await _dbContext.Friends
+            .SingleOrDefaultAsync(fr => (fr.FriendUuid == friendUuid && fr.UserUuid == userUuid) || 
+                                        (fr.FriendUuid == userUuid && fr.UserUuid == friendUuid), cancellationToken);
+
+        if (friendRequest == null)
+        {
+            throw new BadRequestException("Friend request not found");
+        }
+
+        if (friendRequest.UserUuid == userUuid)
+        {
+            throw new BadRequestException("User cannot accept friend request they sent");
+        }
+        
+        if (friendRequest.FriendshipMutual)
+        {
+            throw new BadRequestException("Users are already friends");
+        }
+        
+        friendRequest.FriendshipMutual = true;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+    public async Task RejectFriendAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken)
+    {
+        await CheckIfUserAndFriendValid(userUuid, friendUuid, cancellationToken);
+        
+        var friendRequest = await _dbContext.Friends
+            .SingleOrDefaultAsync(fr => (fr.FriendUuid == friendUuid && fr.UserUuid == userUuid) || 
+                                        (fr.FriendUuid == userUuid && fr.UserUuid == friendUuid), cancellationToken);
+
+        if (friendRequest == null)
+        {
+            throw new BadRequestException("Friend request not found");
+        }
+        
+        _dbContext.Friends.Remove(friendRequest);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+    public async Task<FriendRequestsResultDto> GetFriendRequestsAsync(Guid userUuid, CancellationToken cancellationToken)
+    {
+        var userExists = await _dbContext.Accounts.AsNoTracking()
+            .AnyAsync(a => a.Uuid.Equals(userUuid), cancellationToken);
+        
+        if (!userExists)
+        {
+            throw new NotFoundException("User not found");
+        }
+
+        var friendRequestsIncoming = await _dbContext.Friends.AsNoTracking()
+            .Where(fr => fr.FriendUuid == userUuid && !fr.FriendshipMutual)
+            .Select(fr => new FriendDto
+            {
+                FriendUuid = fr.UserUuid,
+                FriendshipMutual = fr.FriendshipMutual
+            }).ToListAsync(cancellationToken);
+        
+        var friendRequestsOutgoing = await _dbContext.Friends.AsNoTracking()
+            .Where(fr => fr.UserUuid == userUuid && !fr.FriendshipMutual)
+            .Select(fr => new FriendDto
+            {
+                FriendUuid = fr.FriendUuid,
+                FriendshipMutual = fr.FriendshipMutual
+            }).ToListAsync(cancellationToken);
+
+        return new FriendRequestsResultDto
+        {
+            IncomingFriendRequests = friendRequestsIncoming,
+            OutgoingFriendRequests = friendRequestsOutgoing
+        };
+    }
+    public async Task<ICollection<FriendDto>> GetFriendsAsync(Guid userUuid, CancellationToken cancellationToken)
+    {
+        var userExists = await _dbContext.Accounts.AsNoTracking()
+            .AnyAsync(a => a.Uuid.Equals(userUuid), cancellationToken);
+        
+        if (!userExists)
+        {
+            throw new NotFoundException("User not found");
+        }
+        
+        var friends = await _dbContext.Friends.AsNoTracking()
+            .Where(fr => (fr.FriendUuid == userUuid || fr.UserUuid == userUuid) && fr.FriendshipMutual)
+            .Select(fr => new FriendDto
+            {
+                FriendUuid = fr.UserUuid == userUuid ? fr.FriendUuid : fr.UserUuid,
+                FriendshipMutual = fr.FriendshipMutual
+            }).ToListAsync(cancellationToken);
+        
+        return friends;
+    }
+
+    public async Task<Dictionary<Guid, string>> GetSessionPlayersUsernamesAsync(List<Guid> playerUuids, CancellationToken cancellationToken)
+    {
+        var accounts = await _dbContext.Accounts.Where(a => playerUuids.Contains(a.Uuid))
             .ToListAsync(cancellationToken);
-        return accounts.ToDictionary(a => a.Uuid.ToString(), a => a.Username ?? "");
+        return accounts.ToDictionary(a => a.Uuid, a => a.Username ?? "");
+    }
+
+    public async Task<Dictionary<Guid, string>> GetJoinRequestsUsernamesAsync(List<Guid> requestUuids, CancellationToken cancellationToken)
+    {
+        var accounts = await _dbContext.Accounts.Where(a => requestUuids.Contains(a.Uuid))
+            .ToListAsync(cancellationToken);
+        return accounts.ToDictionary(a => a.Uuid, a => a.Username ?? "");
     }
 
     private async Task AddRefreshTokenToDb(string token, Guid accountId, CancellationToken cancellationToken)
     {
-        string hash = _refreshTokenGenerator.Hash(token);
+        var hash = _refreshTokenGenerator.Hash(token);
+        var currentTime = DateTime.UtcNow;
         
-        DateTime currentTime = DateTime.UtcNow;
-        var refreshToken = new RefreshToken()
+        var refreshToken = new RefreshToken
         {
             Uuid = Guid.NewGuid(),
             AccountId = accountId,
@@ -201,8 +324,32 @@ internal sealed class UsersService : IUsersApi
             ReplacedByToken = null
         };
         
-        _dbContext.RefreshTokens.Add(refreshToken);
+        await _dbContext.RefreshTokens.AddAsync(refreshToken, cancellationToken);
         
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task CheckIfUserAndFriendValid(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken)
+    {
+        if (userUuid == friendUuid)
+        {
+            throw new BadRequestException("User and friend cannot have the same uuid");
+        }
+        
+        var userExists = await _dbContext.Accounts.AsNoTracking()
+            .AnyAsync(a => a.Uuid.Equals(userUuid), cancellationToken);
+        
+        if (!userExists)
+        {
+            throw new NotFoundException("User not found");
+        }
+        
+        var friendExists = await _dbContext.Accounts.AsNoTracking()
+            .AnyAsync(a => a.Uuid.Equals(friendUuid), cancellationToken);
+        
+        if (!friendExists)
+        {
+            throw new NotFoundException("Friend not found");
+        }
     }
 }

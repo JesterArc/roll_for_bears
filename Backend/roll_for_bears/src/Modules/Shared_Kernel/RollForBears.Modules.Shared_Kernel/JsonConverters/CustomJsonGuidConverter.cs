@@ -12,7 +12,7 @@ public class CustomJsonGuidConverter : JsonConverter<Guid>
         var guid = reader.GetString()!;
         
         return Guid.TryParseExact(guid, GuidFormat, out var result) 
-            ? result : throw new InvalidFormatException("Invalid identifier format");
+            ? result : throw new InvalidFormatException($"Invalid uuid format: {guid}");
     }
 
     public override void Write(Utf8JsonWriter writer, Guid value, JsonSerializerOptions options)

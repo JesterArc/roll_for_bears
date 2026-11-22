@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Shared_Kernel\RollForBears.Modules.Shared_Kernel\RollForBears.Modules.Shared_Kernel.csproj" />
       <ProjectReference Include="..\RollForBears.Modules.Users.Contracts\RollForBears.Modules.Users.Contracts.csproj" />
     </ItemGroup>
 

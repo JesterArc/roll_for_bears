@@ -59,6 +59,7 @@ public class SessionsService : ISessionsApi
     public async Task<SessionInfoSpecificDto?> GetSpecificSessionInfoAsync(Guid sessionUuid, CancellationToken cancellationToken)
     {
         var session = await _dbContext.Sessions.Where(s => s.Uuid == sessionUuid)
+            .AsNoTracking()
             .FirstOrDefaultAsync(cancellationToken);
         if (session == null)
         {
@@ -83,7 +84,8 @@ public class SessionsService : ISessionsApi
             Players = new List<SessionPlayerInfoDto>(),
             JoinRequests = new List<SessionJoinRequestInfoDto>()
         };
-        specificSession.OwnerUsername = await _userApi.GetPlayerUsernameAsync(session.OwnerUuid.ToString(), cancellationToken) ?? "";
+        // TODO: change method of getting session players so that we can get owner username without separate call
+        specificSession.OwnerUsername = await _userApi.GetPlayerUsernameAsync(session.OwnerUuid, cancellationToken) ?? "";
         specificSession.Players = await GetSessionPlayerListAsync(sessionUuid, cancellationToken);
         specificSession.JoinRequests = await GetSessionJoinRequestListAsync(sessionUuid, cancellationToken);
         return specificSession;
@@ -116,7 +118,7 @@ public class SessionsService : ISessionsApi
     public async Task<ICollection<SessionInfoListViewDto>> GetSessionsFilteredAsync(int page, int pageSize, 
         SessionFilteredRequestDto request, CancellationToken cancellationToken)
     {
-        var sessions = await _dbContext.Sessions
+        var sessions = await _dbContext.Sessions.AsNoTracking()
             .Where(s => request.SessionName == null || s.Name.Contains(request.SessionName))
             .Where(s => request.GameSystem == null || s.GameSystem.Contains(request.GameSystem))
             .Where(s => request.GameType == null || s.GameType.ToString().Equals(request.GameType))
@@ -148,11 +150,11 @@ public class SessionsService : ISessionsApi
     public async Task<ICollection<SessionPlayerInfoDto>> GetSessionPlayerListAsync(Guid sessionUuid, 
         CancellationToken cancellationToken)
     {
-        var players = await _dbContext.SessionPlayers.Where(sp => sp.SessionId == sessionUuid)
+        var players = await _dbContext.SessionPlayers.AsNoTracking()
+            .Where(sp => sp.SessionId == sessionUuid)
             .ToListAsync(cancellationToken);
-        var usernames = await _userApi.GetSessionPlayersUsernamesAsync(
-            players.Where(sp => sp.SessionId == sessionUuid)
-                             .Select(p => p.AccountId).ToList(), cancellationToken);
+        var usernames = await _userApi.GetUsernamesAsync(
+            players.Select(p => p.AccountId).ToList(), cancellationToken);
         return players.Select(sp => new SessionPlayerInfoDto
         {
             Username = usernames[sp.AccountId],
@@ -164,9 +166,8 @@ public class SessionsService : ISessionsApi
     {
         var players = await _dbContext.JoinRequests.Where(sp => sp.SessionUuid == sessionUuid)
             .ToListAsync(cancellationToken);
-        var usernames = await _userApi.GetSessionPlayersUsernamesAsync(
-            players.Where(sp => sp.SessionUuid == sessionUuid)
-                .Select(p => p.AccountUuid).ToList(), cancellationToken);
+        var usernames = await _userApi.GetUsernamesAsync(
+            players.Select(p => p.AccountUuid).ToList(), cancellationToken);
         return players.Select(sp => new SessionJoinRequestInfoDto()
         {
             Username = usernames[sp.AccountUuid],

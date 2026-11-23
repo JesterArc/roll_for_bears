@@ -166,9 +166,10 @@ internal sealed class UsersService : IUsersApi
         
     }
 
-    public async Task<string?> GetPlayerUsernameAsync(string playerUuid, CancellationToken cancellationToken)
+    public async Task<string?> GetPlayerUsernameAsync(Guid playerUuid, CancellationToken cancellationToken)
     {
-        return await _dbContext.Accounts.Where(a=> a.Uuid.ToString() == playerUuid).Select(a => a.Username)
+        return await _dbContext.Accounts.AsNoTracking()
+            .Where(a=> a.Uuid == playerUuid).Select(a => a.Username)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -249,22 +250,29 @@ internal sealed class UsersService : IUsersApi
         {
             throw new NotFoundException("User not found");
         }
-
-        var friendRequestsIncoming = await _dbContext.Friends.AsNoTracking()
-            .Where(fr => fr.FriendUuid == userUuid && !fr.FriendshipMutual)
-            .Select(fr => new FriendDto
-            {
-                FriendUuid = fr.UserUuid,
-                FriendshipMutual = fr.FriendshipMutual
-            }).ToListAsync(cancellationToken);
         
-        var friendRequestsOutgoing = await _dbContext.Friends.AsNoTracking()
-            .Where(fr => fr.UserUuid == userUuid && !fr.FriendshipMutual)
-            .Select(fr => new FriendDto
+        var friendRequests = await _dbContext.Friends.AsNoTracking()
+            .Where(fr => (fr.UserUuid == userUuid || fr.FriendUuid == userUuid) && !fr.FriendshipMutual)
+            .ToListAsync(cancellationToken);
+        
+        var usernames = await GetUsernamesAsync(friendRequests
+            .Select(fr => fr.FriendUuid == userUuid ? userUuid : fr.FriendUuid)
+            .ToList(), cancellationToken);
+        
+        var friendRequestsIncoming = new List<FriendDto>();
+        var friendRequestsOutgoing = new List<FriendDto>();
+        
+        friendRequests.ForEach(fr =>
+        {
+            if (fr.FriendUuid == userUuid)
             {
-                FriendUuid = fr.FriendUuid,
-                FriendshipMutual = fr.FriendshipMutual
-            }).ToListAsync(cancellationToken);
+                friendRequestsIncoming.Add(new FriendDto { Username = usernames[fr.UserUuid], FriendshipMutual = false });
+            }
+            else
+            {
+                friendRequestsOutgoing.Add(new FriendDto { Username = usernames[fr.FriendUuid], FriendshipMutual = false });
+            }
+        });
 
         return new FriendRequestsResultDto
         {
@@ -284,25 +292,23 @@ internal sealed class UsersService : IUsersApi
         
         var friends = await _dbContext.Friends.AsNoTracking()
             .Where(fr => (fr.FriendUuid == userUuid || fr.UserUuid == userUuid) && fr.FriendshipMutual)
-            .Select(fr => new FriendDto
-            {
-                FriendUuid = fr.UserUuid == userUuid ? fr.FriendUuid : fr.UserUuid,
-                FriendshipMutual = fr.FriendshipMutual
-            }).ToListAsync(cancellationToken);
-        
-        return friends;
-    }
-
-    public async Task<Dictionary<Guid, string>> GetSessionPlayersUsernamesAsync(List<Guid> playerUuids, CancellationToken cancellationToken)
-    {
-        var accounts = await _dbContext.Accounts.Where(a => playerUuids.Contains(a.Uuid))
             .ToListAsync(cancellationToken);
-        return accounts.ToDictionary(a => a.Uuid, a => a.Username ?? "");
+        
+        var usernames = await GetUsernamesAsync(friends
+            .Select(fr => fr.FriendUuid == userUuid ? userUuid : fr.FriendUuid)
+            .ToList(), cancellationToken);
+        
+        return friends.Select(fr => new FriendDto
+        {
+            Username = usernames[fr.FriendUuid == userUuid ? userUuid : fr.FriendUuid],
+            FriendshipMutual = true
+        }).ToList();
     }
 
-    public async Task<Dictionary<Guid, string>> GetJoinRequestsUsernamesAsync(List<Guid> requestUuids, CancellationToken cancellationToken)
+    public async Task<Dictionary<Guid, string>> GetUsernamesAsync(List<Guid> userUuids, CancellationToken cancellationToken)
     {
-        var accounts = await _dbContext.Accounts.Where(a => requestUuids.Contains(a.Uuid))
+        var accounts = await _dbContext.Accounts.AsNoTracking()
+            .Where(a => userUuids.Contains(a.Uuid))
             .ToListAsync(cancellationToken);
         return accounts.ToDictionary(a => a.Uuid, a => a.Username ?? "");
     }

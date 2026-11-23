@@ -2,6 +2,6 @@
 
 public sealed record FriendDto
 {
-    public Guid FriendUuid { get; set; }
+    public string Username { get; set; }
     public bool FriendshipMutual { get; set; } = false;
 }

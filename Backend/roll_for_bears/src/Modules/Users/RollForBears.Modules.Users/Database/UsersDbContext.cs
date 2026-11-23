@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RollForBears.Modules.Users.Contracts.Enums;
 using RollForBears.Modules.Users.Models;
 
 namespace RollForBears.Modules.Users.Database;
@@ -15,8 +16,6 @@ public partial class UsersDbContext : DbContext
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     
     public virtual DbSet<Friend> Friends { get; set; }
-    
-    //public virtual DbSet
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,7 +48,8 @@ public partial class UsersDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasColumnName("status")
                 .HasColumnType("users.status")
-                .HasDefaultValueSql("'pending'");
+                .HasDefaultValueSql("'pending'")
+                .HasSentinel(AccountStatus.Pending);
             
             entity.Property(e => e.Username).HasMaxLength(20).HasColumnName("username");
         });
@@ -129,9 +129,10 @@ public partial class UsersDbContext : DbContext
 
             entity.Property(e => e.FriendshipMutual)
                 .HasColumnName("friendship_mutual")
-                .HasDefaultValueSql("false");
+                .HasDefaultValueSql("false")
+                .HasSentinel(false);
 
-            entity.HasOne(e => e.User).WithMany(p => p.Friends)
+            entity.HasOne(e => e.User).WithMany(p => p.FriendsWith)
                 .HasForeignKey(e => e.UserUuid)
                 .HasConstraintName("account_user_uuid_fkey");
 

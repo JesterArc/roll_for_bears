@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RollForBears.Modules.Users.Contracts.Api;
@@ -15,17 +17,21 @@ public sealed class UsersController : ControllerBase
     {
         _usersApi = usersApi;
     }
-
+    
     [HttpPost("register")]
-    public async Task<ActionResult> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult> RegisterAsync([FromBody] RegisterRequestDto request, 
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         await _usersApi.RegisterAsync(request, cancellationToken);
         return Ok();
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<LoginResultDto>> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken)
+    public async Task<ActionResult<LoginResultDto>> LoginAsync([FromBody] LoginRequestDto request, 
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await _usersApi.LoginAsync(request, cancellationToken);
         if (result == null)
         {
@@ -45,7 +51,8 @@ public sealed class UsersController : ControllerBase
     [HttpPost("refresh")]
     public async Task<ActionResult<LoginResultDto>> RefreshTokenAsync(CancellationToken cancellationToken)
     {
-        string? token = Request.Cookies["refreshToken"];
+        cancellationToken.ThrowIfCancellationRequested();
+        var token = Request.Cookies["refreshToken"];
         if (string.IsNullOrEmpty(token))
             return Unauthorized();
         
@@ -63,7 +70,8 @@ public sealed class UsersController : ControllerBase
     [HttpPost("logout")]
     public async Task<IActionResult> LogoutAsync(CancellationToken cancellationToken)
     {
-        string? token = Request.Cookies["refreshToken"];
+        cancellationToken.ThrowIfCancellationRequested();
+        var token = Request.Cookies["refreshToken"];
         if (!string.IsNullOrEmpty(token))
             await _usersApi.LogoutAsync(token, cancellationToken);
         
@@ -79,7 +87,76 @@ public sealed class UsersController : ControllerBase
         
         return NoContent();
     }
+
+    [HttpGet("friend")]
+    public async Task<IActionResult> GetFriendsAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUuidIfLoggedIn();
+        
+        var friends = await _usersApi.GetFriendsAsync(userUuid, cancellationToken);
+        return Ok(friends);
+    }
     
+    [HttpGet("friend/requests")]
+    public async Task<IActionResult> GetFriendRequests(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUuidIfLoggedIn();
+        
+        var requests = await _usersApi.GetFriendRequestsAsync(userUuid, cancellationToken);
+        return Ok(new
+        {
+            Incoming = requests.IncomingFriendRequests,
+            Outgoing = requests.OutgoingFriendRequests
+        });
+    }
+    
+    
+    
+    [HttpPost("friend/send")]
+    public async Task<IActionResult> SendFriendRequestAsync([FromBody] FriendRequestDto request, 
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUuidIfLoggedIn();
+        
+        await _usersApi.SendFriendInviteAsync(userUuid, request.FriendUuid, cancellationToken);
+        return Ok("Friend request sent successfully");
+    }
+
+    [HttpPut("friend/accept")]
+    public async Task<IActionResult> AcceptFriendRequestAsync([FromBody] FriendRequestDto request, 
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUuidIfLoggedIn();
+        
+        await _usersApi.AcceptFriendRequestAsync(userUuid, request.FriendUuid, cancellationToken);
+        return Ok("You are friends now");
+    }
+
+    [HttpDelete("friend/reject")]
+    public async Task<IActionResult> RejectFriendRequestAsync([FromBody] FriendRequestDto request, 
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUuidIfLoggedIn();
+        
+        await _usersApi.RejectFriendAsync(userUuid, request.FriendUuid, cancellationToken);
+        return Ok("Friend request rejected");
+    }
+    
+    [HttpDelete("friend/remove")]
+    public async Task<IActionResult> RemoveFriendAsync([FromBody] FriendRequestDto request, 
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var userUuid = GetUuidIfLoggedIn();
+        
+        await _usersApi.RejectFriendAsync(userUuid, request.FriendUuid, cancellationToken);
+        return Ok("Friend removed");
+    }
     
     private void AddRefreshTokenCookie(string token)
     {
@@ -92,5 +169,15 @@ public sealed class UsersController : ControllerBase
                 Expires = DateTimeOffset.UtcNow.AddHours(48),
                 Path = "/"
             });
+    }
+    
+    private Guid GetUuidIfLoggedIn()
+    {
+        var uuid = Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? Guid.Empty.ToString());
+        if (uuid == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("You are not logged in");
+        }
+        return uuid;
     }
 }

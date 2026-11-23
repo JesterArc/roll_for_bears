@@ -25,10 +25,13 @@ internal sealed class ExceptionHandlerMiddleware(
                 DbUpdateException => 400,
                 _ => 500
             };
+            
             await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
                 {
                     Title = "An error has occurred",
                     Detail = ex.Message,
+                    Status = httpContext.Response.StatusCode,
+                    Instance = httpContext.Request.Path.Value
                 });
         }
     }

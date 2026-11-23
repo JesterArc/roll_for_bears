@@ -15,7 +15,7 @@ public class CustomJsonDateTimeConverter : JsonConverter<DateTime>
         
         return DateTime.TryParseExact(datetime, DateTimeFormat, CultureInfo.InvariantCulture,
             DateTimeStyles.None, out var date) 
-            ? date : throw new InvalidFormatException($"Not a valid datetime format - use {DateTimeFormat}");
+            ? date : throw new InvalidFormatException($"Invalid datetime format: {datetime} - use {DateTimeFormat}");
     }
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)

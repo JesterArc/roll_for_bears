@@ -4,7 +4,7 @@ using RollForBears.Modules.Sessions.Contracts.Enums;
 
 namespace RollForBears.Modules.Sessions.Contracts.DTOs;
 
-public class SessionJoinRequestRoleDto
+public sealed class SessionJoinRequestRoleDto
 {
     [Required]
     [JsonConverter(typeof(JsonStringEnumConverter))]

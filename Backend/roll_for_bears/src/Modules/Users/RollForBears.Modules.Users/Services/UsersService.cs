@@ -256,7 +256,7 @@ internal sealed class UsersService : IUsersApi
             .ToListAsync(cancellationToken);
         
         var usernames = await GetUsernamesAsync(friendRequests
-            .Select(fr => fr.FriendUuid == userUuid ? userUuid : fr.FriendUuid)
+            .Select(fr => fr.FriendUuid == userUuid ? fr.UserUuid : fr.FriendUuid)
             .ToList(), cancellationToken);
         
         var friendRequestsIncoming = new List<FriendDto>();
@@ -295,12 +295,12 @@ internal sealed class UsersService : IUsersApi
             .ToListAsync(cancellationToken);
         
         var usernames = await GetUsernamesAsync(friends
-            .Select(fr => fr.FriendUuid == userUuid ? userUuid : fr.FriendUuid)
+            .Select(fr => fr.FriendUuid == userUuid ? fr.UserUuid : fr.FriendUuid)
             .ToList(), cancellationToken);
         
         return friends.Select(fr => new FriendDto
         {
-            Username = usernames[fr.FriendUuid == userUuid ? userUuid : fr.FriendUuid],
+            Username = usernames[fr.FriendUuid == userUuid ? fr.UserUuid : fr.FriendUuid],
             FriendshipMutual = true
         }).ToList();
     }

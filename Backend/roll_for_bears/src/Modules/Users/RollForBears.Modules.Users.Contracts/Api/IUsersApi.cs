@@ -12,10 +12,6 @@ public interface IUsersApi
     
     Task LogoutAsync(string tokenRequest, CancellationToken cancellationToken);
     Task<string?> GetPlayerUsernameAsync(Guid playerUuid, CancellationToken cancellationToken);
-    Task SendFriendInviteAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken);
-    Task AcceptFriendRequestAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken);
-    Task RejectFriendAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken);
-    Task<FriendRequestsResultDto> GetFriendRequestsAsync(Guid userUuid, CancellationToken cancellationToken);
-    Task<ICollection<FriendDto>> GetFriendsAsync(Guid userUuid, CancellationToken cancellationToken);
     Task<Dictionary<Guid, string>> GetUsernamesAsync(List<Guid> userUuids, CancellationToken cancellationToken);
+    Task CheckIfUserExistsAsync(Guid userUuid, CancellationToken cancellationToken, string message="User not found");
 }

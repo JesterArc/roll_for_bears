@@ -173,138 +173,6 @@ internal sealed class UsersService : IUsersApi
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task SendFriendInviteAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken)
-    {
-        await CheckIfUserAndFriendValid(userUuid, friendUuid, cancellationToken);
-
-        var alreadyFriends = await _dbContext.Friends.AsNoTracking()
-            .AnyAsync(fr => (fr.FriendUuid == friendUuid && fr.UserUuid == userUuid) ||
-                            (fr.FriendUuid == userUuid && fr.UserUuid == friendUuid), cancellationToken);
-
-        if (alreadyFriends)
-        {
-            throw new BadRequestException("Users are already friends or a friend request was already sent");
-        }
-
-        await _dbContext.Friends.AddAsync(
-            new Friend
-            {
-                FriendshipUuid = Guid.NewGuid(),
-                UserUuid = userUuid,
-                FriendUuid = friendUuid,
-                FriendshipMutual = false
-            }, cancellationToken);
-        
-        Console.Write($"user: {userUuid}, friendship: {friendUuid}");
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    public async Task AcceptFriendRequestAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken)
-    {
-        await CheckIfUserAndFriendValid(userUuid, friendUuid, cancellationToken);
-
-        var friendRequest = await _dbContext.Friends
-            .SingleOrDefaultAsync(fr => (fr.FriendUuid == friendUuid && fr.UserUuid == userUuid) || 
-                                        (fr.FriendUuid == userUuid && fr.UserUuid == friendUuid), cancellationToken);
-
-        if (friendRequest == null)
-        {
-            throw new BadRequestException("Friend request not found");
-        }
-
-        if (friendRequest.UserUuid == userUuid)
-        {
-            throw new BadRequestException("User cannot accept friend request they sent");
-        }
-        
-        if (friendRequest.FriendshipMutual)
-        {
-            throw new BadRequestException("Users are already friends");
-        }
-        
-        friendRequest.FriendshipMutual = true;
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
-    public async Task RejectFriendAsync(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken)
-    {
-        await CheckIfUserAndFriendValid(userUuid, friendUuid, cancellationToken);
-        
-        var friendRequest = await _dbContext.Friends
-            .SingleOrDefaultAsync(fr => (fr.FriendUuid == friendUuid && fr.UserUuid == userUuid) || 
-                                        (fr.FriendUuid == userUuid && fr.UserUuid == friendUuid), cancellationToken);
-
-        if (friendRequest == null)
-        {
-            throw new BadRequestException("Friend request not found");
-        }
-        
-        _dbContext.Friends.Remove(friendRequest);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
-    public async Task<FriendRequestsResultDto> GetFriendRequestsAsync(Guid userUuid, CancellationToken cancellationToken)
-    {
-        var userExists = await _dbContext.Accounts.AsNoTracking()
-            .AnyAsync(a => a.Uuid.Equals(userUuid), cancellationToken);
-        
-        if (!userExists)
-        {
-            throw new NotFoundException("User not found");
-        }
-        
-        var friendRequests = await _dbContext.Friends.AsNoTracking()
-            .Where(fr => (fr.UserUuid == userUuid || fr.FriendUuid == userUuid) && !fr.FriendshipMutual)
-            .ToListAsync(cancellationToken);
-        
-        var usernames = await GetUsernamesAsync(friendRequests
-            .Select(fr => fr.FriendUuid == userUuid ? fr.UserUuid : fr.FriendUuid)
-            .ToList(), cancellationToken);
-        
-        var friendRequestsIncoming = new List<FriendDto>();
-        var friendRequestsOutgoing = new List<FriendDto>();
-        
-        friendRequests.ForEach(fr =>
-        {
-            if (fr.FriendUuid == userUuid)
-            {
-                friendRequestsIncoming.Add(new FriendDto { Username = usernames[fr.UserUuid], FriendshipMutual = false });
-            }
-            else
-            {
-                friendRequestsOutgoing.Add(new FriendDto { Username = usernames[fr.FriendUuid], FriendshipMutual = false });
-            }
-        });
-
-        return new FriendRequestsResultDto
-        {
-            IncomingFriendRequests = friendRequestsIncoming,
-            OutgoingFriendRequests = friendRequestsOutgoing
-        };
-    }
-    public async Task<ICollection<FriendDto>> GetFriendsAsync(Guid userUuid, CancellationToken cancellationToken)
-    {
-        var userExists = await _dbContext.Accounts.AsNoTracking()
-            .AnyAsync(a => a.Uuid.Equals(userUuid), cancellationToken);
-        
-        if (!userExists)
-        {
-            throw new NotFoundException("User not found");
-        }
-        
-        var friends = await _dbContext.Friends.AsNoTracking()
-            .Where(fr => (fr.FriendUuid == userUuid || fr.UserUuid == userUuid) && fr.FriendshipMutual)
-            .ToListAsync(cancellationToken);
-        
-        var usernames = await GetUsernamesAsync(friends
-            .Select(fr => fr.FriendUuid == userUuid ? fr.UserUuid : fr.FriendUuid)
-            .ToList(), cancellationToken);
-        
-        return friends.Select(fr => new FriendDto
-        {
-            Username = usernames[fr.FriendUuid == userUuid ? fr.UserUuid : fr.FriendUuid],
-            FriendshipMutual = true
-        }).ToList();
-    }
-
     public async Task<Dictionary<Guid, string>> GetUsernamesAsync(List<Guid> userUuids, CancellationToken cancellationToken)
     {
         var accounts = await _dbContext.Accounts.AsNoTracking()
@@ -335,27 +203,14 @@ internal sealed class UsersService : IUsersApi
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task CheckIfUserAndFriendValid(Guid userUuid, Guid friendUuid, CancellationToken cancellationToken)
+    public async Task CheckIfUserExistsAsync(Guid userUuid, CancellationToken cancellationToken, string message="User not found")
     {
-        if (userUuid == friendUuid)
-        {
-            throw new BadRequestException("User and friend cannot have the same uuid");
-        }
-        
         var userExists = await _dbContext.Accounts.AsNoTracking()
             .AnyAsync(a => a.Uuid.Equals(userUuid), cancellationToken);
         
         if (!userExists)
         {
-            throw new NotFoundException("User not found");
-        }
-        
-        var friendExists = await _dbContext.Accounts.AsNoTracking()
-            .AnyAsync(a => a.Uuid.Equals(friendUuid), cancellationToken);
-        
-        if (!friendExists)
-        {
-            throw new NotFoundException("Friend not found");
+            throw new NotFoundException(message);
         }
     }
 }

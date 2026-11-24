@@ -28,6 +28,7 @@ public static class UsersModule
             ));
 
         services.AddScoped<IUsersApi, UsersService>();
+        services.AddScoped<IFriendsApi, FriendsService>();
         
         string pepper = Environment.GetEnvironmentVariable("PASSWORD_PEPPER")
             ?? throw new InvalidOperationException("PASSWORD_PEPPER is not defined");

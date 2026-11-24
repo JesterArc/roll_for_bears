@@ -8,7 +8,7 @@ using RollForBears.Modules.Users.Contracts.DTOs;
 namespace RollForBears.Modules.Users.Controllers;
 
 [ApiController]
-[Route("api/users")]
+[Route("api/[controller]")]
 public sealed class UsersController : ControllerBase
 {
     private readonly IUsersApi _usersApi;
@@ -88,75 +88,7 @@ public sealed class UsersController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("friend")]
-    public async Task<IActionResult> GetFriendsAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var userUuid = GetUuidIfLoggedIn();
-        
-        var friends = await _usersApi.GetFriendsAsync(userUuid, cancellationToken);
-        return Ok(friends);
-    }
     
-    [HttpGet("friend/requests")]
-    public async Task<IActionResult> GetFriendRequests(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var userUuid = GetUuidIfLoggedIn();
-        
-        var requests = await _usersApi.GetFriendRequestsAsync(userUuid, cancellationToken);
-        return Ok(new
-        {
-            Incoming = requests.IncomingFriendRequests,
-            Outgoing = requests.OutgoingFriendRequests
-        });
-    }
-    
-    
-    
-    [HttpPost("friend/send")]
-    public async Task<IActionResult> SendFriendRequestAsync([FromBody] FriendRequestDto request, 
-        CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var userUuid = GetUuidIfLoggedIn();
-        
-        await _usersApi.SendFriendInviteAsync(userUuid, request.FriendUuid, cancellationToken);
-        return Ok("Friend request sent successfully");
-    }
-
-    [HttpPut("friend/accept")]
-    public async Task<IActionResult> AcceptFriendRequestAsync([FromBody] FriendRequestDto request, 
-        CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var userUuid = GetUuidIfLoggedIn();
-        
-        await _usersApi.AcceptFriendRequestAsync(userUuid, request.FriendUuid, cancellationToken);
-        return Ok("You are friends now");
-    }
-
-    [HttpDelete("friend/reject")]
-    public async Task<IActionResult> RejectFriendRequestAsync([FromBody] FriendRequestDto request, 
-        CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var userUuid = GetUuidIfLoggedIn();
-        
-        await _usersApi.RejectFriendAsync(userUuid, request.FriendUuid, cancellationToken);
-        return Ok("Friend request rejected");
-    }
-    
-    [HttpDelete("friend/remove")]
-    public async Task<IActionResult> RemoveFriendAsync([FromBody] FriendRequestDto request, 
-        CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var userUuid = GetUuidIfLoggedIn();
-        
-        await _usersApi.RejectFriendAsync(userUuid, request.FriendUuid, cancellationToken);
-        return Ok("Friend removed");
-    }
     
     private void AddRefreshTokenCookie(string token)
     {

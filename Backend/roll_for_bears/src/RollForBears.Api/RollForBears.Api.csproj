@@ -24,6 +24,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Modules\RpgContent\RollForBears.Modules.RpgContent.Contracts\RollForBears.Modules.RpgContent.Contracts.csproj" />
+      <ProjectReference Include="..\Modules\RpgContent\RollForBears.Modules.RpgContent\RollForBears.Modules.RpgContent.csproj" />
       <ProjectReference Include="..\Modules\Sessions\RollForBears.Modules.Sessions\RollForBears.Modules.Sessions.csproj" />
       <ProjectReference Include="..\Modules\Users\RollForBears.Modules.Users\RollForBears.Modules.Users.csproj" />
     </ItemGroup>

@@ -5,6 +5,7 @@ using RollForBears.Api;
 using RollForBears.Api.MainModules.LoginModule.Services;
 using RollForBears.Modules.Sessions;
 using RollForBears.Modules.Users;
+using RollForBears.Modules.RpgContent;
 
 Env.Load();
 
@@ -17,6 +18,7 @@ builder.Services
 
 builder.Services.AddUsersModule(builder.Configuration);
 builder.Services.AddSessionsModule(builder.Configuration);
+builder.Services.AddRpgContentModule(builder.Configuration);
 
 builder.Services.AddScoped<IUserValidateService, UserValidateService>();
 

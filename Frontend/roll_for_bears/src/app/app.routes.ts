@@ -7,6 +7,7 @@ import { YourSessions } from './pages/your-sessions/your-sessions';
 import { Sessions } from './pages/sessions/sessions';
 import { CreateSession } from './pages/create-session/create-session';
 import { SessionDetails } from './pages/session-details/session-details';
+import { ChooseGameSystem } from './pages/create-session/choose-game-system/choose-game-system';
 
 export const routes: Routes = [
   {
@@ -45,5 +46,9 @@ export const routes: Routes = [
   {
     path: 'session-details/:sessionId',
     component: SessionDetails
+  },
+  {
+    path: 'create-session/game-system',
+    component: ChooseGameSystem
   }
 ];

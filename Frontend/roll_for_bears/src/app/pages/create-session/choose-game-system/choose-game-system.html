@@ -1,0 +1,49 @@
+<app-nav-bar></app-nav-bar>
+
+<section class="game-system-list">
+  <button
+    class="back-button"
+    type="button"
+    aria-label="Go back"
+    (click)="goBack()"
+  >
+    ←
+  </button>
+
+  <h2 id="game-system-list-title">Choose game system</h2>
+
+  <div class="game-system-list-choices">
+<!--  TODO: dodac for -->
+    <label class="game-system-choice">
+      <span>D&amp;D 5e (2024 / 2014)</span>
+      <input type="radio" name="game-system" value="dnd" checked>
+    </label>
+
+    <label class="game-system-choice">
+      <span>Pathfinder 2e</span>
+      <input type="radio" name="game-system" value="pathfinder">
+    </label>
+  </div>
+
+  <section class="game-system-preview">
+    <div class="game-system-preview-img">
+      Tu bedzie przykladowe zdjecie karty postaci dla systemu jezeli taka bedzie
+    </div>
+
+    <p class="game-system-description">
+      A fantasy role-playing game about exploring dangerous places and facing
+      challenges as a party.
+    </p>
+  </section>
+
+  <footer class="game-system-list-footer">
+    <button
+      class="game-system-confirm"
+      type="button"
+    >
+      Confirm
+    </button>
+  </footer>
+</section>
+
+

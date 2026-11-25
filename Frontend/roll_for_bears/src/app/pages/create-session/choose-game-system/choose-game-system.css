@@ -1,0 +1,113 @@
+.game-system-list {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  grid-template-rows: auto auto 1fr auto;
+  align-items: start;
+  gap: 16px 28px;
+  min-height: calc(100vh - 6vh);
+  padding: 24px;
+  color: var(--rfb-primary-text);
+  background: var(--rfb-page-background);
+}
+
+.back-button,
+.game-system-list h2,
+.game-system-list-footer {
+  grid-column: 1 / -1;
+}
+
+.back-button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--rfb-secondary-text);
+  font-size: 24px;
+}
+
+.back-button:hover {
+  color: var(--rfb-purple-soft-text);
+  background: var(--rfb-component-background-grey-hover);
+}
+
+.game-system-list h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.game-system-list-choices {
+  display: grid;
+  gap: 10px;
+}
+
+.game-system-choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 14px;
+  border: 1px solid var(--rfb-border-grey);
+  border-left: 5px solid var(--rfb-border-purple);
+  border-radius: 8px;
+  background: var(--rfb-component-background-grey);
+  font-weight: 600;
+}
+
+
+.game-system-choice:hover {
+  background: var(--rfb-component-background-grey-hover);
+  border-color: var(--rfb-border-purple);
+}
+
+.game-system-choice input {
+  flex-shrink: 0;
+  margin: 0;
+  accent-color: var(--rfb-strong-purple);
+}
+
+.game-system-preview {
+  min-width: 0;
+  max-height: min(55vh, 480px);
+  overflow-y: auto;
+}
+
+.game-system-preview-img {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--rfb-soft-purple);
+  color: var(--rfb-purple-soft-text);
+  text-align: center;
+}
+
+.game-system-description {
+  margin-left: 12px;
+  color: var(--rfb-secondary-text);
+  line-height: 2;
+  overflow-wrap: anywhere;
+}
+
+.game-system-list-footer {
+  justify-self: end;
+}
+
+.game-system-confirm {
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--rfb-strong-purple);
+  color: var(--rfb-primary-for-purple-components-text);
+  font-weight: 600;
+}
+
+.game-system-confirm:hover {
+  box-shadow: inset 0 0 0 2px var(--rfb-purple-soft-text);
+}
